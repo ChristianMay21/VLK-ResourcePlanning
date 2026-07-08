@@ -10,6 +10,7 @@ import sharp from 'sharp'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Clients } from './collections/Clients'
+import { Employees } from './collections/Employees'
 import { ProjectPhases } from './collections/ProjectPhases'
 import { Projects } from './collections/Projects'
 import { Roles } from './collections/Roles'
@@ -25,7 +26,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Clients, Projects, ProjectPhases, Roles, ProjectRoleAssignments],
+  collections: [Users, Media, Clients, Employees, Projects, ProjectPhases, Roles, ProjectRoleAssignments],
   globals: [Settings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

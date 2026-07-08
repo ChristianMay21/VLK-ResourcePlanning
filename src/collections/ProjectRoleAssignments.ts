@@ -12,7 +12,7 @@ export const ProjectRoleAssignments: CollectionConfig = {
     {
       name: 'employee',
       type: 'relationship',
-      relationTo: 'users',
+      relationTo: 'employees',
       required: true,
     },
     {

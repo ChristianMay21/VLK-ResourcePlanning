@@ -3,10 +3,8 @@
 import { createContext, useContext, useState } from 'react'
 import type ProjectDetail from '@/components/ProjectDetail/ProjectDetail'
 
-export type ModalState = {
-  component: typeof ProjectDetail
-  componentProps: React.ComponentProps<typeof ProjectDetail>
-}
+export type ModalState =
+  | { component: typeof ProjectDetail; componentProps: React.ComponentProps<typeof ProjectDetail> }
 
 type ModalContextType = {
   modal: ModalState | null

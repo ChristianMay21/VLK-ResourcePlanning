@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     clients: Client;
+    employees: Employee;
     projects: Project;
     'project-phases': ProjectPhase;
     roles: Role;
@@ -84,6 +85,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     clients: ClientsSelect<false> | ClientsSelect<true>;
+    employees: EmployeesSelect<false> | EmployeesSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     'project-phases': ProjectPhasesSelect<false> | ProjectPhasesSelect<true>;
     roles: RolesSelect<false> | RolesSelect<true>;
@@ -137,7 +139,6 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: string;
-  maximumHours: number;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -188,6 +189,17 @@ export interface Client {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employees".
+ */
+export interface Employee {
+  id: string;
+  name: string;
+  maximumHours: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "projects".
  */
 export interface Project {
@@ -210,7 +222,7 @@ export interface Project {
 export interface ProjectRoleAssignment {
   id: string;
   role: string | Role;
-  employee: string | User;
+  employee: string | Employee;
   allocatedHours: number;
   updatedAt: string;
   createdAt: string;
@@ -272,6 +284,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'clients';
         value: string | Client;
+      } | null)
+    | ({
+        relationTo: 'employees';
+        value: string | Employee;
       } | null)
     | ({
         relationTo: 'projects';
@@ -336,7 +352,6 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  maximumHours?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -378,6 +393,16 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface ClientsSelect<T extends boolean = true> {
   name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employees_select".
+ */
+export interface EmployeesSelect<T extends boolean = true> {
+  name?: T;
+  maximumHours?: T;
   updatedAt?: T;
   createdAt?: T;
 }

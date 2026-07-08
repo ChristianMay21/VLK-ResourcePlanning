@@ -6,12 +6,5 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   auth: true,
-  fields: [
-    {
-      name: 'maximumHours',
-      type: 'number',
-      required: true,
-      defaultValue: 40,
-    },
-  ],
+  fields: [],
 }
