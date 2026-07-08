@@ -12,6 +12,11 @@ export const Employees: CollectionConfig = {
       required: true,
     },
     {
+      name: 'photo',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
       name: 'jobTitle',
       type: 'text',
     },

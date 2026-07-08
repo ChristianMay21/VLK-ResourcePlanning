@@ -194,6 +194,7 @@ export interface Client {
 export interface Employee {
   id: string;
   name: string;
+  photo?: (string | null) | Media;
   jobTitle?: string | null;
   maximumHours: number;
   updatedAt: string;
@@ -403,6 +404,7 @@ export interface ClientsSelect<T extends boolean = true> {
  */
 export interface EmployeesSelect<T extends boolean = true> {
   name?: T;
+  photo?: T;
   jobTitle?: T;
   maximumHours?: T;
   updatedAt?: T;
