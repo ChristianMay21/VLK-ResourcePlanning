@@ -1,0 +1,346 @@
+@use "easings" as _e;
+@use "sass:string";
+
+$id: string.unique-id();
+
+@mixin fade-in($theme: light) {
+  $name: op-#{$id}-fade-in;
+
+  @keyframes op-#{$id}-fade-in {
+    to {
+      opacity: 1;
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin fade-in-bloom($theme: light) {
+  @if $theme == light {
+    $name: op-#{$id}-fade-in-bloom;
+
+    @keyframes op-#{$id}-fade-in-bloom {
+      0% {
+        opacity: 0;
+        filter: brightness(1) blur(20px);
+      }
+      10% {
+        opacity: 1;
+        filter: brightness(2) blur(10px);
+      }
+      100% {
+        opacity: 1;
+        filter: brightness(1) blur(0);
+      }
+    }
+    animation: $name 2s #{_e.$ease-3};
+  } @else if $theme == dark {
+    $name: op-#{$id}-fade-in-bloom-dark;
+
+    @keyframes op-#{$id}-fade-in-bloom-dark {
+      0% {
+        opacity: 0;
+        filter: brightness(1) blur(20px);
+      }
+      10% {
+        opacity: 1;
+        filter: brightness(0.5) blur(10px);
+      }
+      100% {
+        opacity: 1;
+        filter: brightness(1) blur(0);
+      }
+    }
+    animation: $name 2s #{_e.$ease-3};
+  }
+}
+@mixin fade-out($theme: light) {
+  $name: op-#{$id}-fade-out;
+
+  @keyframes op-#{$id}-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin fade-out-bloom($theme: light) {
+  @if $theme == light {
+    $name: op-#{$id}-fade-out-bloom;
+
+    @keyframes op-#{$id}-fade-out-bloom {
+      100% {
+        opacity: 0;
+        filter: brightness(1) blur(20px);
+      }
+      10% {
+        opacity: 1;
+        filter: brightness(2) blur(10px);
+      }
+      0% {
+        opacity: 1;
+        filter: brightness(1) blur(0);
+      }
+    }
+    animation: $name 2s #{_e.$ease-3};
+  } @else if $theme == dark {
+    $name: op-#{$id}-fade-out-bloom-dark;
+
+    @keyframes op-#{$id}-fade-out-bloom-dark {
+      100% {
+        opacity: 0;
+        filter: brightness(1) blur(20px);
+      }
+      10% {
+        opacity: 1;
+        filter: brightness(0.5) blur(10px);
+      }
+      0% {
+        opacity: 1;
+        filter: brightness(1) blur(0);
+      }
+    }
+    animation: $name 2s #{_e.$ease-3};
+  }
+}
+@mixin scale-up($theme: light) {
+  $name: op-#{$id}-scale-up;
+
+  @keyframes op-#{$id}-scale-up {
+    to {
+      transform: scale(1.25);
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin scale-down($theme: light) {
+  $name: op-#{$id}-scale-down;
+
+  @keyframes op-#{$id}-scale-down {
+    to {
+      transform: scale(0.75);
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin slide-out-up($theme: light) {
+  $name: op-#{$id}-slide-out-up;
+
+  @keyframes op-#{$id}-slide-out-up {
+    to {
+      transform: translateY(-100%);
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin slide-out-down($theme: light) {
+  $name: op-#{$id}-slide-out-down;
+
+  @keyframes op-#{$id}-slide-out-down {
+    to {
+      transform: translateY(100%);
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin slide-out-right($theme: light) {
+  $name: op-#{$id}-slide-out-right;
+
+  @keyframes op-#{$id}-slide-out-right {
+    to {
+      transform: translateX(100%);
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin slide-out-left($theme: light) {
+  $name: op-#{$id}-slide-out-left;
+
+  @keyframes op-#{$id}-slide-out-left {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin slide-in-up($theme: light) {
+  $name: op-#{$id}-slide-in-up;
+
+  @keyframes op-#{$id}-slide-in-up {
+    from {
+      transform: translateY(100%);
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin slide-in-down($theme: light) {
+  $name: op-#{$id}-slide-in-down;
+
+  @keyframes op-#{$id}-slide-in-down {
+    from {
+      transform: translateY(-100%);
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin slide-in-right($theme: light) {
+  $name: op-#{$id}-slide-in-right;
+
+  @keyframes op-#{$id}-slide-in-right {
+    from {
+      transform: translateX(-100%);
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin slide-in-left($theme: light) {
+  $name: op-#{$id}-slide-in-left;
+
+  @keyframes op-#{$id}-slide-in-left {
+    from {
+      transform: translateX(100%);
+    }
+  }
+  animation: #{$name} 0.5s #{_e.$ease-3};
+}
+@mixin shake-x($theme: light) {
+  $name: op-#{$id}-shake-x;
+
+  @keyframes op-#{$id}-shake-x {
+    0%,
+    100% {
+      transform: translateX(0%);
+    }
+    20% {
+      transform: translateX(-5%);
+    }
+    40% {
+      transform: translateX(5%);
+    }
+    60% {
+      transform: translateX(-5%);
+    }
+    80% {
+      transform: translateX(5%);
+    }
+  }
+  animation: #{$name} 0.75s #{_e.$ease-out-5};
+}
+@mixin shake-y($theme: light) {
+  $name: op-#{$id}-shake-y;
+
+  @keyframes op-#{$id}-shake-y {
+    0%,
+    100% {
+      transform: translateY(0%);
+    }
+    20% {
+      transform: translateY(-5%);
+    }
+    40% {
+      transform: translateY(5%);
+    }
+    60% {
+      transform: translateY(-5%);
+    }
+    80% {
+      transform: translateY(5%);
+    }
+  }
+  animation: #{$name} 0.75s #{_e.$ease-out-5};
+}
+@mixin shake-z($theme: light) {
+  $name: op-#{$id}-shake-z;
+
+  @keyframes op-#{$id}-shake-z {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    20% {
+      transform: rotate(-2deg);
+    }
+    40% {
+      transform: rotate(2deg);
+    }
+    60% {
+      transform: rotate(-2deg);
+    }
+    80% {
+      transform: rotate(2deg);
+    }
+  }
+  animation: #{$name} 1s #{_e.$ease-in-out-3};
+}
+@mixin spin($theme: light) {
+  $name: op-#{$id}-spin;
+
+  @keyframes op-#{$id}-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+  animation: #{$name} 2s linear;
+}
+@mixin ping($theme: light) {
+  $name: op-#{$id}-ping;
+
+  @keyframes op-#{$id}-ping {
+    90%,
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+  animation: #{$name} 5s #{_e.$ease-out-3};
+}
+@mixin blink($theme: light) {
+  $name: op-#{$id}-blink;
+
+  @keyframes op-#{$id}-blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  animation: #{$name} 1s #{_e.$ease-out-3};
+}
+@mixin float($theme: light) {
+  $name: op-#{$id}-float;
+
+  @keyframes op-#{$id}-float {
+    50% {
+      transform: translateY(-25%);
+    }
+  }
+  animation: #{$name} 3s #{_e.$ease-in-out-3};
+}
+@mixin bounce($theme: light) {
+  $name: op-#{$id}-bounce;
+
+  @keyframes op-#{$id}-bounce {
+    25% {
+      transform: translateY(-20%);
+    }
+    40% {
+      transform: translateY(-3%);
+    }
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+    }
+  }
+  animation: #{$name} 2s #{_e.$ease-squish-2};
+}
+@mixin pulse($theme: light) {
+  $name: op-#{$id}-pulse;
+
+  @keyframes op-#{$id}-pulse {
+    50% {
+      transform: scale(0.9, 0.9);
+    }
+  }
+  animation: #{$name} 2s #{_e.$ease-out-3};
+}

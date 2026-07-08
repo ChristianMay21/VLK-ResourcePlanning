@@ -1,0 +1,7 @@
+@use "sass:list";
+$ratio-square: 1;
+$ratio-landscape: list.slash(4, 3);
+$ratio-portrait: list.slash(3, 4);
+$ratio-widescreen: list.slash(16, 9);
+$ratio-ultrawide: list.slash(18, 5);
+$ratio-golden: list.slash(1.618, 1);
