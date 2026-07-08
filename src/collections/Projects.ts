@@ -22,5 +22,21 @@ export const Projects: CollectionConfig = {
       type: 'number',
       required: true,
     },
+    {
+      name: 'phases',
+      type: 'relationship',
+      relationTo: 'project-phases',
+      hasMany: true,
+    },
+    {
+      name: 'startDate',
+      type: 'date',
+      required: true,
+    },
+    {
+      name: 'endDate',
+      type: 'date',
+      required: true,
+    },
   ],
 }

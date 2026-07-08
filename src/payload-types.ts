@@ -71,6 +71,8 @@ export interface Config {
     media: Media;
     clients: Client;
     projects: Project;
+    'project-phases': ProjectPhase;
+    roles: Role;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +84,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     clients: ClientsSelect<false> | ClientsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'project-phases': ProjectPhasesSelect<false> | ProjectPhasesSelect<true>;
+    roles: RolesSelect<false> | RolesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -188,6 +192,31 @@ export interface Project {
   name: string;
   client: string | Client;
   budget: number;
+  phases?: (string | ProjectPhase)[] | null;
+  startDate: string;
+  endDate: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-phases".
+ */
+export interface ProjectPhase {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roles".
+ */
+export interface Role {
+  id: string;
+  name: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -230,6 +259,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'projects';
         value: string | Project;
+      } | null)
+    | ({
+        relationTo: 'project-phases';
+        value: string | ProjectPhase;
+      } | null)
+    | ({
+        relationTo: 'roles';
+        value: string | Role;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -330,6 +367,29 @@ export interface ProjectsSelect<T extends boolean = true> {
   name?: T;
   client?: T;
   budget?: T;
+  phases?: T;
+  startDate?: T;
+  endDate?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-phases_select".
+ */
+export interface ProjectPhasesSelect<T extends boolean = true> {
+  name?: T;
+  startDate?: T;
+  endDate?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roles_select".
+ */
+export interface RolesSelect<T extends boolean = true> {
+  name?: T;
   updatedAt?: T;
   createdAt?: T;
 }
