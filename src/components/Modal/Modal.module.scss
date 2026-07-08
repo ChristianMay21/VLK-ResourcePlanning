@@ -1,0 +1,38 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(0 0 0 / 0.4);
+  z-index: 100;
+}
+
+.panel {
+  position: relative;
+  background-color: white;
+  border-radius: 8px;
+  padding: $size-6;
+  min-width: 480px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.close {
+  position: absolute;
+  top: $size-3;
+  right: $size-3;
+  background: none;
+  border: none;
+  color: $gray-6;
+  cursor: pointer;
+  font-size: $font-size-2;
+  line-height: 1;
+
+  &:hover {
+    color: $gray-9;
+  }
+}
