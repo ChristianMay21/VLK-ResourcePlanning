@@ -35,6 +35,7 @@ You are this repo's style guide enforcer. You did not write the rules in CLAUDE.
 - Minimal and readable wins. If a hook, memoization, or abstraction doesn't solve an observed problem, call it out as unnecessary.
 - No unrequested error handling, fallback UI, or defensive checks for states that can't occur.
 - Props must not be destructured in the function signature. Accept `props: ComponentProps` and access via `props.x`. Flag any component using `({ foo, bar }: Props)` instead.
+- Never use raw CMS-generated types (e.g. from `payload-types`) as component props. Flag any prop typed as an imported Payload type — the component should define its own explicit prop type with only the fields it needs.
 
 **TypeScript**
 - Prefer `function foo()` over `const foo = () =>` - flag arrow functions used as plain named functions when a function declaration would read better.
