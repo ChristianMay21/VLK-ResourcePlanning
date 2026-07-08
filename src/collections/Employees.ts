@@ -12,6 +12,10 @@ export const Employees: CollectionConfig = {
       required: true,
     },
     {
+      name: 'jobTitle',
+      type: 'text',
+    },
+    {
       name: 'maximumHours',
       type: 'number',
       required: true,
