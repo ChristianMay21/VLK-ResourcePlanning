@@ -195,6 +195,7 @@ export interface Project {
   name: string;
   client: string | Client;
   budget: number;
+  isComplete?: boolean | null;
   roleAssignments?: (string | ProjectRoleAssignment)[] | null;
   phases?: (string | ProjectPhase)[] | null;
   startDate: string;
@@ -388,6 +389,7 @@ export interface ProjectsSelect<T extends boolean = true> {
   name?: T;
   client?: T;
   budget?: T;
+  isComplete?: T;
   roleAssignments?: T;
   phases?: T;
   startDate?: T;

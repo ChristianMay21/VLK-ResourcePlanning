@@ -32,6 +32,7 @@
 
 ## React
 - Keep React minimal and readable - layer on 'fancy' functionality only if it actually solves a problem.
+- Do not destructure props in the function signature. Accept `props: ComponentProps` and access via `props.x`.
 
 ## TypeScript
 - Prefer traditional functions to arrow functions - they're more readable.

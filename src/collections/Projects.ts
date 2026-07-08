@@ -23,6 +23,11 @@ export const Projects: CollectionConfig = {
       required: true,
     },
     {
+      name: 'isComplete',
+      type: 'checkbox',
+      defaultValue: false,
+    },
+    {
       name: 'roleAssignments',
       type: 'relationship',
       relationTo: 'project-role-assignments',
