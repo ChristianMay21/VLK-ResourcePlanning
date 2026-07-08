@@ -13,6 +13,7 @@ import { Clients } from './collections/Clients'
 import { ProjectPhases } from './collections/ProjectPhases'
 import { Projects } from './collections/Projects'
 import { Roles } from './collections/Roles'
+import { ProjectRoleAssignments } from './collections/ProjectRoleAssignments'
 import { Settings } from './collections/Settings'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -24,7 +25,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Clients, Projects, ProjectPhases, Roles],
+  collections: [Users, Media, Clients, Projects, ProjectPhases, Roles, ProjectRoleAssignments],
   globals: [Settings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

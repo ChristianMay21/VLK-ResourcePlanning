@@ -1,4 +1,5 @@
 import React from 'react'
+import Nav from '@/components/Nav/Nav'
 import './styles.scss'
 
 export const metadata = {
@@ -12,6 +13,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
+        <Nav />
         <main>{children}</main>
       </body>
     </html>

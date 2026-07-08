@@ -73,6 +73,7 @@ export interface Config {
     projects: Project;
     'project-phases': ProjectPhase;
     roles: Role;
+    'project-role-assignments': ProjectRoleAssignment;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +87,7 @@ export interface Config {
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     'project-phases': ProjectPhasesSelect<false> | ProjectPhasesSelect<true>;
     roles: RolesSelect<false> | RolesSelect<true>;
+    'project-role-assignments': ProjectRoleAssignmentsSelect<false> | ProjectRoleAssignmentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -135,6 +137,7 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: string;
+  maximumHours: number;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -192,9 +195,32 @@ export interface Project {
   name: string;
   client: string | Client;
   budget: number;
+  roleAssignments?: (string | ProjectRoleAssignment)[] | null;
   phases?: (string | ProjectPhase)[] | null;
   startDate: string;
   endDate: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-role-assignments".
+ */
+export interface ProjectRoleAssignment {
+  id: string;
+  role: string | Role;
+  employee: string | User;
+  allocatedHours: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roles".
+ */
+export interface Role {
+  id: string;
+  name: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -207,16 +233,6 @@ export interface ProjectPhase {
   name: string;
   startDate: string;
   endDate: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "roles".
- */
-export interface Role {
-  id: string;
-  name: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -267,6 +283,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'roles';
         value: string | Role;
+      } | null)
+    | ({
+        relationTo: 'project-role-assignments';
+        value: string | ProjectRoleAssignment;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -315,6 +335,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  maximumHours?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -367,6 +388,7 @@ export interface ProjectsSelect<T extends boolean = true> {
   name?: T;
   client?: T;
   budget?: T;
+  roleAssignments?: T;
   phases?: T;
   startDate?: T;
   endDate?: T;
@@ -390,6 +412,17 @@ export interface ProjectPhasesSelect<T extends boolean = true> {
  */
 export interface RolesSelect<T extends boolean = true> {
   name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-role-assignments_select".
+ */
+export interface ProjectRoleAssignmentsSelect<T extends boolean = true> {
+  role?: T;
+  employee?: T;
+  allocatedHours?: T;
   updatedAt?: T;
   createdAt?: T;
 }

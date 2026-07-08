@@ -23,6 +23,12 @@ export const Projects: CollectionConfig = {
       required: true,
     },
     {
+      name: 'roleAssignments',
+      type: 'relationship',
+      relationTo: 'project-role-assignments',
+      hasMany: true,
+    },
+    {
       name: 'phases',
       type: 'relationship',
       relationTo: 'project-phases',
