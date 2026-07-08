@@ -1,2 +1,18 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
 .root {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: $size-4;
+}
+
+.heading {
+  padding: $size-2 $size-3;
+  color: $gray-6;
+  font-family: $font-sans;
+  font-size: $font-size-0;
+  font-weight: $font-weight-6;
+  letter-spacing: $font-letterspacing-2;
+  text-transform: uppercase;
+  border-bottom: 2px solid $gray-3;
 }
