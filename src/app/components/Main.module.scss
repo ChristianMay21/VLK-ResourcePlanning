@@ -1,7 +1,7 @@
-@use '../../app/styles/open-props/index.scss' as op;
+@use '../styles/design-system/index.scss' as *;
 
 .main {
-  background-color: op.$gray-1;
+  background-color: $gray-1;
   height: 100px;
   width: 100px;
 }
