@@ -1,0 +1,37 @@
+{
+	"name": "open-props-scss",
+	"type": "module",
+	"version": "0.8.0",
+	"license": "MIT",
+	"author": {
+		"name": "Mayank"
+	},
+	"keywords": [
+		"css",
+		"open props",
+		"sass",
+		"scss",
+		"variables"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mayank99/open-props-scss.git"
+	},
+	"main": "index.scss",
+	"files": [
+		"*.scss"
+	],
+	"exports": {
+		".": "./index.scss",
+		"./*": "./*"
+	},
+	"scripts": {
+		"build": "node ./generateScss.mjs",
+		"dev": "node --watch ./generateScss.mjs"
+	},
+	"devDependencies": {
+		"lightningcss": "^1.27.0",
+		"open-props": "^1.7.7",
+		"sass": "^1.80.6"
+	}
+}
