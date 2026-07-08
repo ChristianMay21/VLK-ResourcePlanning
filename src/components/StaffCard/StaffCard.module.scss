@@ -1,2 +1,33 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
 .root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $size-2;
+  padding: $size-4;
+  background-color: white;
+  border: 1px solid $gray-2;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.photo {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.name {
+  margin: 0;
+  font-family: $font-sans;
+  font-size: $font-size-1;
+  font-weight: $font-weight-6;
+  color: $gray-9;
+}
+
+.jobTitle {
+  margin: 0;
+  font-family: $font-sans;
+  font-size: $font-size-0;
+  color: $gray-6;
 }
