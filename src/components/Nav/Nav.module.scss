@@ -1,0 +1,26 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  padding: $size-2 $size-4;
+  background-color: $gray-0;
+  border-bottom: 1px solid $gray-3;
+}
+
+.link {
+  padding: $size-1 $size-3;
+  border-radius: 4px;
+  color: $gray-7;
+  font-family: $font-sans;
+  font-size: $font-size-1;
+  font-weight: $font-weight-5;
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    background-color: $gray-2;
+    color: $gray-9;
+  }
+}
