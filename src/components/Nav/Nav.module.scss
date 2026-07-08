@@ -23,4 +23,10 @@
     background-color: $gray-2;
     color: $gray-9;
   }
+
+  &[data-active='true'] {
+    background-color: $gray-2;
+    color: $gray-9;
+    font-weight: $font-weight-6;
+  }
 }
