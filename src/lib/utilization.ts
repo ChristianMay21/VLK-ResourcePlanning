@@ -4,6 +4,7 @@ export type AssignmentForUtil = {
   hours: number
   startDate: string
   endDate: string
+  isInternal?: boolean
 }
 
 function overlapDays(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): number {
@@ -67,6 +68,19 @@ export function rollingUtilizationPct(
   return (totalPct / numWeeks) * 100
 }
 
+export function rollingUtilizationSplit(
+  assignments: AssignmentForUtil[],
+  weeklyCapacity: number,
+  numWeeks: number,
+  today: Date,
+): { billablePct: number; internalPct: number; totalPct: number } {
+  const billable = assignments.filter(a => !a.isInternal)
+  const internal = assignments.filter(a => a.isInternal)
+  const billablePct = rollingUtilizationPct(billable, weeklyCapacity, numWeeks, today)
+  const internalPct = rollingUtilizationPct(internal, weeklyCapacity, numWeeks, today)
+  return { billablePct, internalPct, totalPct: billablePct + internalPct }
+}
+
 function lerp(a: number, b: number, t: number): number {
   return Math.round(a + (b - a) * t)
 }
@@ -88,10 +102,22 @@ export function utilizationColor(pct: number): string {
   return `rgb(${r}, ${g}, ${b})`
 }
 
+const INTERNAL_RING_COLOR = '#6b6558'
+
 export function ringBackground(pct: number, color: string): string {
   const clampedPct = Math.min(Math.max(pct, 0), 100)
   const trackColor = '#e7ded0'
   return `conic-gradient(from -90deg, ${color} ${clampedPct}%, ${trackColor} ${clampedPct}%)`
+}
+
+export function ringBackgroundSplit(billablePct: number, internalPct: number): string {
+  const totalPct = Math.min(billablePct + internalPct, 100)
+  const billColor = utilizationColor(billablePct + internalPct)
+  const billDeg = Math.min((billablePct / 100) * 360, 360)
+  const internalWidthPct = Math.min(totalPct - Math.min(billablePct, 100), 100)
+  const internalEndDeg = Math.min(billDeg + (internalWidthPct / 100) * 360, 360)
+  const trackColor = '#e7ded0'
+  return `conic-gradient(from -90deg, ${billColor} 0deg ${billDeg.toFixed(1)}deg, ${INTERNAL_RING_COLOR} ${billDeg.toFixed(1)}deg ${internalEndDeg.toFixed(1)}deg, ${trackColor} ${internalEndDeg.toFixed(1)}deg 360deg)`
 }
 
 export function weeklySchedule(
@@ -104,5 +130,24 @@ export function weeklySchedule(
     const weekStart = addDays(monday, i * 7)
     const weekEnd = addDays(weekStart, 6)
     return { weekStart, hours: scheduledHoursForWeek(assignments, weekStart, weekEnd) }
+  })
+}
+
+export function weeklyScheduleSplit(
+  assignments: AssignmentForUtil[],
+  numWeeks: number,
+  today: Date,
+): Array<{ weekStart: Date; billableHours: number; internalHours: number }> {
+  const billable = assignments.filter(a => !a.isInternal)
+  const internal = assignments.filter(a => a.isInternal)
+  const monday = startOfWeekMonday(today)
+  return Array.from({ length: numWeeks }, (_, i) => {
+    const weekStart = addDays(monday, i * 7)
+    const weekEnd = addDays(weekStart, 6)
+    return {
+      weekStart,
+      billableHours: scheduledHoursForWeek(billable, weekStart, weekEnd),
+      internalHours: scheduledHoursForWeek(internal, weekStart, weekEnd),
+    }
   })
 }

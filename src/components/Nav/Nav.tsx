@@ -17,6 +17,9 @@ export default function Nav() {
         <Link className={styles.tab} href="/employees" data-active={pathname.startsWith('/employees')}>
           EMPLOYEES
         </Link>
+        <Link className={styles.tab} href="/internal-work" data-active={pathname.startsWith('/internal-work')}>
+          INTERNAL WORK
+        </Link>
         <Link className={styles.tab} href="/settings" data-active={pathname.startsWith('/settings')}>
           ADMIN
         </Link>

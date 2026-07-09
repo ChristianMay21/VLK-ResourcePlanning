@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
-import type { Employee, Project, ProjectPhase, Role, Task } from '@/payload-types'
+import type { Employee, InternalWorkCategory, Project, ProjectPhase, Role, Task } from '@/payload-types'
 
 function resolveId(val: string | { id: string }): string {
   return typeof val === 'string' ? val : val.id
@@ -51,31 +51,52 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Build assignments for utilization (dates + hours)
-  type AssignmentForUtil = { hours: number; startDate: string; endDate: string }
+  type AssignmentForUtil = { hours: number; startDate: string; endDate: string; isInternal?: boolean }
   const assignmentsForUtil: AssignmentForUtil[] = []
 
-  // Build assigned work grouped by project
   type WorkEntry = {
     id: string
-    type: 'project' | 'phase' | 'task'
+    type: 'project' | 'phase' | 'task' | 'internal-task'
     name: string
     roleName: string
     hours: number
   }
-  const byProject: Record<string, { projectId: string; projectName: string; items: WorkEntry[] }> = {}
+  const byProject: Record<string, { projectId: string | null; projectName: string; isInternal: boolean; items: WorkEntry[] }> = {}
 
   for (const assignment of empAssignments) {
     const wv = assignment.workItem.value
     if (typeof wv !== 'object') continue
-    const wItem = wv as { id: string; name: string; startDate?: string; endDate?: string }
-
-    if (wItem.startDate && wItem.endDate) {
-      assignmentsForUtil.push({ hours: assignment.hours, startDate: wItem.startDate, endDate: wItem.endDate })
-    }
+    const wItem = wv as { id: string; name: string; startDate?: string; endDate?: string; category?: string | InternalWorkCategory | null }
 
     const role = assignment.role
     const roleName = typeof role === 'object' ? (role as Role).name : ''
+
+    // Check if task is internal (has category set)
+    const isInternalTask =
+      assignment.workItem.relationTo === 'tasks' &&
+      !!(wItem as Task).category
+
+    if (wItem.startDate && wItem.endDate) {
+      assignmentsForUtil.push({
+        hours: assignment.hours,
+        startDate: wItem.startDate,
+        endDate: wItem.endDate,
+        isInternal: isInternalTask,
+      })
+    }
+
+    if (isInternalTask) {
+      const task = wItem as Task
+      const cat = task.category
+      const catId = typeof cat === 'object' && cat !== null ? (cat as InternalWorkCategory).id : (cat as string | null)
+      const catName = typeof cat === 'object' && cat !== null ? (cat as InternalWorkCategory).name : 'Internal Work'
+      const groupKey = `internal:${catId ?? 'unknown'}`
+      if (!byProject[groupKey]) {
+        byProject[groupKey] = { projectId: null, projectName: catName ?? 'Internal Work', isInternal: true, items: [] }
+      }
+      byProject[groupKey].items.push({ id: wItem.id, type: 'internal-task', name: wItem.name, roleName, hours: assignment.hours })
+      continue
+    }
 
     let projectId = ''
     let projectName = ''
@@ -101,7 +122,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (!projectId) continue
-    if (!byProject[projectId]) byProject[projectId] = { projectId, projectName, items: [] }
+    if (!byProject[projectId]) byProject[projectId] = { projectId, projectName, isInternal: false, items: [] }
     byProject[projectId].items.push({ id: wItem.id, type: workType, name: wItem.name, roleName, hours: assignment.hours })
   }
 

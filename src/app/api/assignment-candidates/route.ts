@@ -8,15 +8,17 @@ export async function GET(req: NextRequest) {
   const workItemId = req.nextUrl.searchParams.get('workItemId')
   const workItemType = req.nextUrl.searchParams.get('workItemType') as 'phase' | 'task' | null
   const projectId = req.nextUrl.searchParams.get('projectId')
+  const categoryId = req.nextUrl.searchParams.get('categoryId')
 
-  if (!workItemId || !workItemType || !projectId) {
+  if (!workItemId || !workItemType) {
     return NextResponse.json({ error: 'Missing required params' }, { status: 400 })
   }
 
+  const isInternal = !projectId && !!categoryId
+
   const payload = await getPayload({ config: await config })
 
-  const [project, workItem, { docs: employees }, { docs: allAssignments }, { docs: roles }] = await Promise.all([
-    payload.findByID({ collection: 'projects', id: projectId, depth: 1, overrideAccess: true }).catch(() => null),
+  const [workItem, { docs: employees }, { docs: allAssignments }, { docs: roles }] = await Promise.all([
     workItemType === 'phase'
       ? payload.findByID({ collection: 'project-phases', id: workItemId, depth: 0, overrideAccess: true }).catch(() => null)
       : payload.findByID({ collection: 'tasks', id: workItemId, depth: 0, overrideAccess: true }).catch(() => null),
@@ -25,34 +27,42 @@ export async function GET(req: NextRequest) {
     payload.find({ collection: 'roles', limit: 100, overrideAccess: true }),
   ])
 
-  if (!project || !workItem) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  }
+  if (!workItem) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const proj = project as Project
-  const sectorName = proj.sector && typeof proj.sector === 'object'
-    ? (proj.sector as Sector).name
-    : null
+  // For project tasks/phases: fetch project for sector and build project work item ID set
+  let sectorName: string | null = null
+  const projectWorkItemIds = new Set<string>()
+
+  if (!isInternal && projectId) {
+    const project = await payload.findByID({
+      collection: 'projects', id: projectId, depth: 1, overrideAccess: true,
+    }).catch(() => null) as Project | null
+
+    if (project) {
+      sectorName = project.sector && typeof project.sector === 'object'
+        ? (project.sector as Sector).name
+        : null
+
+      const phaseIds = (project.phases ?? []).map(
+        (p: string | { id: string }) => (typeof p === 'string' ? p : p.id),
+      )
+      const { docs: projectTasks } = phaseIds.length > 0
+        ? await payload.find({
+            collection: 'tasks',
+            where: { phase: { in: phaseIds } },
+            limit: 10000,
+            overrideAccess: true,
+          })
+        : { docs: [] }
+      const taskIds = projectTasks.map((t: { id: string }) => t.id)
+      ;[projectId, ...phaseIds, ...taskIds].forEach(id => projectWorkItemIds.add(id))
+    }
+  }
 
   const wi = workItem as ProjectPhase | Task
   const requiredSkills = (wi.requiredSkills ?? []).map((s: { skill: string }) => s.skill)
 
-  // Build set of all work item IDs belonging to this project (for rate lookup)
-  const phaseIds = (proj.phases ?? []).map(
-    (p: string | { id: string }) => (typeof p === 'string' ? p : p.id),
-  )
-  const { docs: projectTasks } = phaseIds.length > 0
-    ? await payload.find({
-        collection: 'tasks',
-        where: { phase: { in: phaseIds } },
-        limit: 10000,
-        overrideAccess: true,
-      })
-    : { docs: [] }
-  const taskIds = projectTasks.map((t: { id: string }) => t.id)
-  const projectWorkItemIds = new Set([projectId, ...phaseIds, ...taskIds])
-
-  // Build per-employee assignment map (for utilization) and per-employee project rate
+  // Build per-employee util data and project rate map
   const empAssignments: Record<string, { hours: number; startDate: string; endDate: string }[]> = {}
   const empProjectRates: Record<string, number> = {}
 
@@ -69,8 +79,7 @@ export async function GET(req: NextRequest) {
       empAssignments[emp.id].push({ hours: assignment.hours, startDate: wItem.startDate, endDate: wItem.endDate })
     }
 
-    // Track the first rate found for this employee on any of the project's work items
-    if (wItem.id && projectWorkItemIds.has(wItem.id) && assignment.rate != null && empProjectRates[emp.id] == null) {
+    if (!isInternal && wItem.id && projectWorkItemIds.has(wItem.id) && assignment.rate != null && empProjectRates[emp.id] == null) {
       empProjectRates[emp.id] = assignment.rate
     }
   }
@@ -100,10 +109,12 @@ export async function GET(req: NextRequest) {
     }
   })
 
-  const collectionSlug = workItemType === 'phase' ? 'project-phases' : 'tasks'
+  // Filter roles by allowedOn
   const roleList = roles
     .filter((r: Role) => {
-      const allowed = r.allowedOn ?? ['projects', 'project-phases', 'tasks']
+      const allowed = r.allowedOn ?? ['projects', 'project-phases', 'tasks', 'internal']
+      if (isInternal) return allowed.includes('internal')
+      const collectionSlug = workItemType === 'phase' ? 'project-phases' : 'tasks'
       return allowed.includes(collectionSlug as 'projects' | 'project-phases' | 'tasks')
     })
     .map((r: Role) => ({ id: r.id, name: r.name }))
@@ -111,6 +122,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     requiredSkills,
     projectSectorName: sectorName,
+    isInternal,
     candidates,
     empProjectRates,
     roles: roleList,

@@ -15,7 +15,11 @@ export const Tasks: CollectionConfig = {
       name: 'phase',
       type: 'relationship',
       relationTo: 'project-phases',
-      required: true,
+    },
+    {
+      name: 'category',
+      type: 'relationship',
+      relationTo: 'internal-work-categories',
     },
     {
       name: 'startDate',

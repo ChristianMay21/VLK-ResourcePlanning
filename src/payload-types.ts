@@ -78,6 +78,7 @@ export interface Config {
     tasks: Task;
     assignments: Assignment;
     skills: Skill;
+    'internal-work-categories': InternalWorkCategory;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -96,6 +97,7 @@ export interface Config {
     tasks: TasksSelect<false> | TasksSelect<true>;
     assignments: AssignmentsSelect<false> | AssignmentsSelect<true>;
     skills: SkillsSelect<false> | SkillsSelect<true>;
+    'internal-work-categories': InternalWorkCategoriesSelect<false> | InternalWorkCategoriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -228,7 +230,7 @@ export interface Employee {
 export interface Role {
   id: string;
   name: string;
-  allowedOn: ('projects' | 'project-phases' | 'tasks')[];
+  allowedOn: ('projects' | 'project-phases' | 'tasks' | 'internal')[];
   updatedAt: string;
   createdAt: string;
 }
@@ -285,7 +287,8 @@ export interface ProjectPhase {
 export interface Task {
   id: string;
   name: string;
-  phase: string | ProjectPhase;
+  phase?: (string | null) | ProjectPhase;
+  category?: (string | null) | InternalWorkCategory;
   startDate: string;
   endDate: string;
   requiredSkills?:
@@ -301,6 +304,16 @@ export interface Task {
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal-work-categories".
+ */
+export interface InternalWorkCategory {
+  id: string;
+  name: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -408,6 +421,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'skills';
         value: string | Skill;
+      } | null)
+    | ({
+        relationTo: 'internal-work-categories';
+        value: string | InternalWorkCategory;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -587,6 +604,7 @@ export interface ProjectPhasesSelect<T extends boolean = true> {
 export interface TasksSelect<T extends boolean = true> {
   name?: T;
   phase?: T;
+  category?: T;
   startDate?: T;
   endDate?: T;
   requiredSkills?:
@@ -624,6 +642,15 @@ export interface AssignmentsSelect<T extends boolean = true> {
  * via the `definition` "skills_select".
  */
 export interface SkillsSelect<T extends boolean = true> {
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal-work-categories_select".
+ */
+export interface InternalWorkCategoriesSelect<T extends boolean = true> {
   name?: T;
   updatedAt?: T;
   createdAt?: T;

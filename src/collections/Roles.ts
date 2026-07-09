@@ -19,11 +19,12 @@ export const Roles: CollectionConfig = {
       type: 'select',
       hasMany: true,
       required: true,
-      defaultValue: ['projects', 'project-phases', 'tasks'],
+      defaultValue: ['projects', 'project-phases', 'tasks', 'internal'],
       options: [
         { label: 'Project', value: 'projects' },
         { label: 'Phase', value: 'project-phases' },
         { label: 'Task', value: 'tasks' },
+        { label: 'Internal', value: 'internal' },
       ],
     },
   ],

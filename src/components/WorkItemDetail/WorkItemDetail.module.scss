@@ -21,6 +21,15 @@
   margin-bottom: 8px;
 }
 
+.internalBadge {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #6b6558;
+  border: 1px solid #6b6558;
+  padding: 3px 8px;
+}
+
 .typeBadge {
   font-family: $font-plex-mono;
   font-size: 10px;
@@ -48,6 +57,15 @@
   &:hover {
     text-decoration: underline;
   }
+}
+
+.categoryLabel {
+  display: block;
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #6b6558;
+  margin-bottom: 6px;
 }
 
 .name {

@@ -1,8 +1,7 @@
 import styles from './UtilizationRing.module.scss'
-import { ringBackground, utilizationColor } from '@/lib/utilization'
+import { ringBackground, ringBackgroundSplit, utilizationColor } from '@/lib/utilization'
 import { getInitials } from '@/lib/dateUtils'
 
-// Size variants match the spec's three avatar sizes
 const SIZE_MAP = {
   xs: { outer: 24, inner: 18, fontSize: 8 },
   sm: { outer: 40, inner: 32, fontSize: 12 },
@@ -16,16 +15,29 @@ type UtilizationRingProps = {
   avatarColor: string
   size: 'xs' | 'sm' | 'md' | 'lg'
   windowWeeks?: number
+  billablePct?: number
+  internalPct?: number
 }
 
 export default function UtilizationRing(props: UtilizationRingProps) {
   const { outer, inner, fontSize } = SIZE_MAP[props.size]
-  const ringColor = utilizationColor(props.pct)
-  const ringBg = ringBackground(props.pct, ringColor)
   const pctRounded = Math.round(props.pct)
-  const tooltip = props.windowWeeks
-    ? `${pctRounded}% utilized (Next ${props.windowWeeks} weeks)`
-    : `${pctRounded}% utilized`
+
+  const hasSplit = props.billablePct != null && props.internalPct != null
+  const ringBg = hasSplit
+    ? ringBackgroundSplit(props.billablePct!, props.internalPct!)
+    : ringBackground(props.pct, utilizationColor(props.pct))
+
+  let tooltip: string
+  if (hasSplit && props.windowWeeks) {
+    const b = Math.round(props.billablePct!)
+    const n = Math.round(props.internalPct!)
+    tooltip = `${b}% billable + ${n}% internal work = ${pctRounded}% total utilized (Next ${props.windowWeeks} weeks)`
+  } else if (props.windowWeeks) {
+    tooltip = `${pctRounded}% utilized (Next ${props.windowWeeks} weeks)`
+  } else {
+    tooltip = `${pctRounded}% utilized`
+  }
 
   return (
     <span

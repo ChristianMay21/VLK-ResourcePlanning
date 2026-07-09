@@ -18,6 +18,7 @@ import { Sectors } from './collections/Sectors'
 import { Tasks } from './collections/Tasks'
 import { Assignments } from './collections/Assignments'
 import { Skills } from './collections/Skills'
+import { InternalWorkCategories } from './collections/InternalWorkCategories'
 import { Settings } from './collections/Settings'
 
 const filename = fileURLToPath(import.meta.url)
@@ -42,6 +43,7 @@ export default buildConfig({
     Tasks,
     Assignments,
     Skills,
+    InternalWorkCategories,
   ],
   globals: [Settings],
   editor: lexicalEditor(),

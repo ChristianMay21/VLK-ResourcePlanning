@@ -10,15 +10,19 @@ const ALLOWED_ON_OPTIONS = [
   { value: 'projects', label: 'Project' },
   { value: 'project-phases', label: 'Phase' },
   { value: 'tasks', label: 'Task' },
+  { value: 'internal', label: 'Internal' },
 ] as const
 
-type AllowedOnValue = 'projects' | 'project-phases' | 'tasks'
+type AllowedOnValue = 'projects' | 'project-phases' | 'tasks' | 'internal'
 
 const TYPE_LABELS: Record<string, string> = {
   projects: 'projects',
   'project-phases': 'phases',
   tasks: 'tasks',
+  internal: 'internal',
 }
+
+const DEFAULT_ALLOWED_ON: AllowedOnValue[] = ['projects', 'project-phases', 'tasks', 'internal']
 
 type Employee = {
   id: string
@@ -34,6 +38,7 @@ type Client = { id: string; name: string }
 type Role = { id: string; name: string; allowedOn: AllowedOnValue[] }
 type Sector = { id: string; name: string }
 type Skill = { id: string; name: string }
+type Category = { id: string; name: string }
 
 export default function AdminPage() {
   const { setDrawer } = useDrawer()
@@ -42,20 +47,24 @@ export default function AdminPage() {
   const [roles, setRoles] = useState<Role[]>([])
   const [sectors, setSectors] = useState<Sector[]>([])
   const [skills, setSkills] = useState<Skill[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [editingClientId, setEditingClientId] = useState<string | null>(null)
   const [editingClientName, setEditingClientName] = useState('')
   const [newClientName, setNewClientName] = useState('')
   const [editingRoleId, setEditingRoleId] = useState<string | null>(null)
   const [editingRoleName, setEditingRoleName] = useState('')
-  const [editingRoleAllowedOn, setEditingRoleAllowedOn] = useState<AllowedOnValue[]>(['projects', 'project-phases', 'tasks'])
+  const [editingRoleAllowedOn, setEditingRoleAllowedOn] = useState<AllowedOnValue[]>(DEFAULT_ALLOWED_ON)
   const [newRoleName, setNewRoleName] = useState('')
-  const [newRoleAllowedOn, setNewRoleAllowedOn] = useState<AllowedOnValue[]>(['projects', 'project-phases', 'tasks'])
+  const [newRoleAllowedOn, setNewRoleAllowedOn] = useState<AllowedOnValue[]>(DEFAULT_ALLOWED_ON)
   const [editingSectorId, setEditingSectorId] = useState<string | null>(null)
   const [editingSectorName, setEditingSectorName] = useState('')
   const [newSectorName, setNewSectorName] = useState('')
   const [editingSkillId, setEditingSkillId] = useState<string | null>(null)
   const [editingSkillName, setEditingSkillName] = useState('')
   const [newSkillName, setNewSkillName] = useState('')
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null)
+  const [editingCategoryName, setEditingCategoryName] = useState('')
+  const [newCategoryName, setNewCategoryName] = useState('')
 
   const loadEmployees = useCallback(() => {
     fetch('/api/employees?limit=200&depth=1&sort=name').then(r => r.json()).then(d => {
@@ -83,7 +92,7 @@ export default function AdminPage() {
       setRoles((d.docs ?? []).map((r: { id: string; name: string; allowedOn?: AllowedOnValue[] | null }) => ({
         id: r.id,
         name: r.name,
-        allowedOn: r.allowedOn ?? (['projects', 'project-phases', 'tasks'] as AllowedOnValue[]),
+        allowedOn: r.allowedOn ?? DEFAULT_ALLOWED_ON,
       })))
     })
   }, [])
@@ -96,13 +105,18 @@ export default function AdminPage() {
     fetch('/api/skills?limit=200&sort=name').then(r => r.json()).then(d => setSkills(d.docs ?? []))
   }, [])
 
+  const loadCategories = useCallback(() => {
+    fetch('/api/internal-work-categories?limit=200&sort=name').then(r => r.json()).then(d => setCategories(d.docs ?? []))
+  }, [])
+
   useEffect(() => {
     loadEmployees()
     loadClients()
     loadRoles()
     loadSectors()
     loadSkills()
-  }, [loadEmployees, loadClients, loadRoles, loadSectors, loadSkills])
+    loadCategories()
+  }, [loadEmployees, loadClients, loadRoles, loadSectors, loadSkills, loadCategories])
 
   function openAddEmployee() {
     setDrawer({ component: EmployeeForm, componentProps: { onSave: loadEmployees } })
@@ -234,7 +248,7 @@ export default function AdminPage() {
       return
     }
     setNewRoleName('')
-    setNewRoleAllowedOn(['projects', 'project-phases', 'tasks'])
+    setNewRoleAllowedOn(DEFAULT_ALLOWED_ON)
     loadRoles()
   }
 
@@ -310,6 +324,49 @@ export default function AdminPage() {
     })
     setNewSkillName('')
     loadSkills()
+  }
+
+  // Internal Work Categories CRUD
+  async function saveCategory(id: string) {
+    if (!editingCategoryName.trim()) return
+    const res = await fetch(`/api/admin-internal-categories/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: editingCategoryName.trim() }),
+    })
+    if (!res.ok) {
+      const data = await res.json()
+      alert(data.error ?? 'Cannot save')
+      return
+    }
+    setEditingCategoryId(null)
+    loadCategories()
+  }
+
+  async function deleteCategory(id: string) {
+    const res = await fetch(`/api/admin-internal-categories/${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      const data = await res.json()
+      alert(data.error ?? 'Cannot delete')
+      return
+    }
+    loadCategories()
+  }
+
+  async function addCategory() {
+    if (!newCategoryName.trim()) return
+    const res = await fetch('/api/admin-internal-categories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: newCategoryName.trim() }),
+    })
+    if (!res.ok) {
+      const data = await res.json()
+      alert(data.error ?? 'Cannot create')
+      return
+    }
+    setNewCategoryName('')
+    loadCategories()
   }
 
   return (
@@ -428,6 +485,48 @@ export default function AdminPage() {
               </label>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Internal Work Categories Section */}
+      <section className={styles.section}>
+        <h3 className={styles.sectionTitle}>Internal Work Categories</h3>
+        <div className={styles.list}>
+          {categories.map(cat => (
+            <div key={cat.id} className={styles.listRow}>
+              {editingCategoryId === cat.id ? (
+                <>
+                  <input
+                    type="text"
+                    className={styles.inlineInput}
+                    value={editingCategoryName}
+                    onChange={e => setEditingCategoryName(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') saveCategory(cat.id); if (e.key === 'Escape') setEditingCategoryId(null) }}
+                    autoFocus
+                  />
+                  <button type="button" className={styles.saveBtn} onClick={() => saveCategory(cat.id)}>SAVE</button>
+                  <button type="button" className={styles.cancelBtn} onClick={() => setEditingCategoryId(null)}>CANCEL</button>
+                </>
+              ) : (
+                <>
+                  <span className={styles.itemName}>{cat.name}</span>
+                  <button type="button" className={styles.editBtn} onClick={() => { setEditingCategoryId(cat.id); setEditingCategoryName(cat.name) }}>EDIT</button>
+                  <button type="button" className={styles.deleteBtn} onClick={() => deleteCategory(cat.id)}>DELETE</button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className={styles.addRow}>
+          <input
+            type="text"
+            className={styles.inlineInput}
+            placeholder="New category name…"
+            value={newCategoryName}
+            onChange={e => setNewCategoryName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') addCategory() }}
+          />
+          <button type="button" className={styles.addBtn} onClick={addCategory} disabled={!newCategoryName.trim()}>ADD</button>
         </div>
       </section>
 

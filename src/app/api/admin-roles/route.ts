@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 
-type AllowedOn = 'projects' | 'project-phases' | 'tasks'
-const VALID_TYPES: AllowedOn[] = ['projects', 'project-phases', 'tasks']
+type AllowedOn = 'projects' | 'project-phases' | 'tasks' | 'internal'
+const VALID_TYPES: AllowedOn[] = ['projects', 'project-phases', 'tasks', 'internal']
 
 export async function POST(req: NextRequest) {
   const body = await req.json()

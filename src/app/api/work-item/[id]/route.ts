@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
-import type { Employee, Project, ProjectPhase, Role, Sector, Task } from '@/payload-types'
+import type { Employee, InternalWorkCategory, Project, ProjectPhase, Role, Sector, Task } from '@/payload-types'
 import { deriveStatus } from '@/lib/dateUtils'
 
 type Params = { id: string }
@@ -41,7 +41,10 @@ export async function GET(req: NextRequest, context: { params: Promise<Params> }
 
   if (!workItemResult) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  // Build phase → project lookup
+  // Check if this is an internal task
+  const isInternalTask = type === 'task' && !!(workItemResult as Task).category
+
+  // Build phase → project lookup (for non-internal tasks)
   const phaseToProject: Record<string, Project> = {}
   for (const project of allProjects) {
     for (const phase of (project.phases ?? [])) {
@@ -49,54 +52,62 @@ export async function GET(req: NextRequest, context: { params: Promise<Params> }
     }
   }
 
-  let phaseId: string
   let project: Project | null = null
+  let category: InternalWorkCategory | null = null
 
-  if (type === 'phase') {
-    phaseId = id
+  if (isInternalTask) {
+    const task = workItemResult as Task
+    const cat = task.category
+    category = typeof cat === 'object' && cat !== null ? cat as InternalWorkCategory : null
+  } else if (type === 'phase') {
     project = phaseToProject[id] ?? null
   } else {
     const task = workItemResult as Task
-    phaseId = resolveId(task.phase as string | ProjectPhase)
-    project = phaseToProject[phaseId] ?? null
+    const phaseVal = task.phase
+    const phaseId = phaseVal ? resolveId(phaseVal as string | ProjectPhase) : null
+    if (phaseId) project = phaseToProject[phaseId] ?? null
   }
 
-  if (!project) return NextResponse.json({ error: 'Parent project not found' }, { status: 404 })
+  if (!isInternalTask && !project) {
+    return NextResponse.json({ error: 'Parent project not found' }, { status: 404 })
+  }
 
-  const projectSectorName = project.sector && typeof project.sector === 'object'
+  const projectSectorName = project?.sector && typeof project.sector === 'object'
     ? (project.sector as Sector).name
     : null
 
-  // Get sorted phases for this project
-  const projectPhaseIds = (project.phases ?? []).map(p => resolveId(p as string | ProjectPhase))
-  const sortedPhases = projectPhaseIds
-    .map(pid => allPhases.find(ph => ph.id === pid))
-    .filter((ph): ph is ProjectPhase => Boolean(ph))
-
-  // Build gantt bars
+  // Build gantt bars (only for project-linked items)
   type GanttBar = {
     id: string; label: string; type: 'phase' | 'task'
     status: 'upcoming' | 'active' | 'complete'; startDate: string; endDate: string
   }
   const ganttBars: GanttBar[] = []
-  for (const phase of sortedPhases) {
-    ganttBars.push({
-      id: phase.id, label: phase.name, type: 'phase',
-      status: deriveStatus(phase.startDate, phase.endDate),
-      startDate: phase.startDate, endDate: phase.endDate,
-    })
-    for (const task of (phase.tasks ?? [])) {
-      if (typeof task !== 'object') continue
-      const t = task as Task
+
+  if (project) {
+    const projectPhaseIds = (project.phases ?? []).map(p => resolveId(p as string | ProjectPhase))
+    const sortedPhases = projectPhaseIds
+      .map(pid => allPhases.find(ph => ph.id === pid))
+      .filter((ph): ph is ProjectPhase => Boolean(ph))
+
+    for (const phase of sortedPhases) {
       ganttBars.push({
-        id: t.id, label: t.name, type: 'task',
-        status: deriveStatus(t.startDate, t.endDate, t.completed),
-        startDate: t.startDate, endDate: t.endDate,
+        id: phase.id, label: phase.name, type: 'phase',
+        status: deriveStatus(phase.startDate, phase.endDate),
+        startDate: phase.startDate, endDate: phase.endDate,
       })
+      for (const task of (phase.tasks ?? [])) {
+        if (typeof task !== 'object') continue
+        const t = task as Task
+        ganttBars.push({
+          id: t.id, label: t.name, type: 'task',
+          status: deriveStatus(t.startDate, t.endDate, t.completed),
+          startDate: t.startDate, endDate: t.endDate,
+        })
+      }
     }
   }
 
-  // Fetch direct assignments for this work item
+  // Fetch direct assignments
   const { docs: directAssignmentDocs } = await payload.find({
     collection: 'assignments',
     where: {
@@ -130,10 +141,10 @@ export async function GET(req: NextRequest, context: { params: Promise<Params> }
 
   const directAssignments: TeamMember[] = directAssignmentDocs.map(toTeamMember).filter((m): m is TeamMember => m !== null)
 
-  // For phases: fetch task-level assignments as child assignments
+  // Child assignments (phases only)
   type ChildMember = { viaName: string } & TeamMember
-
   let childAssignments: ChildMember[] = []
+
   if (type === 'phase') {
     const phase = workItemResult as ProjectPhase
     const taskItems = (phase.tasks ?? [])
@@ -167,7 +178,6 @@ export async function GET(req: NextRequest, context: { params: Promise<Params> }
     }
   }
 
-  // Build item info
   const dismissedSuggestions: string[] = type === 'task'
     ? ((workItemResult as Task).dismissedSuggestions ?? []).map(d => d.key)
     : []
@@ -197,8 +207,12 @@ export async function GET(req: NextRequest, context: { params: Promise<Params> }
 
   return NextResponse.json({
     type,
+    isInternal: isInternalTask,
     item: itemData,
-    project: { id: project.id, name: project.name, startDate: project.startDate, endDate: project.endDate },
+    project: project
+      ? { id: project.id, name: project.name, startDate: project.startDate, endDate: project.endDate }
+      : null,
+    category: category ? { id: category.id, name: category.name } : null,
     projectSectorName,
     ganttBars,
     directAssignments,

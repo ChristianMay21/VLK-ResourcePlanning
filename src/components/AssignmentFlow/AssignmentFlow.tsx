@@ -26,7 +26,9 @@ type AssignmentFlowProps = {
   workItemType: 'phase' | 'task'
   workItemStartDate: string
   workItemEndDate: string
-  projectId: string
+  projectId: string | null
+  isInternal?: boolean
+  categoryId?: string | null
   onClose: () => void
   onSave: () => void
 }
@@ -85,7 +87,16 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`/api/assignment-candidates?workItemId=${props.workItemId}&workItemType=${props.workItemType}&projectId=${props.projectId}`)
+    const params = new URLSearchParams({
+      workItemId: props.workItemId,
+      workItemType: props.workItemType,
+    })
+    if (props.isInternal && props.categoryId) {
+      params.set('categoryId', props.categoryId)
+    } else if (props.projectId) {
+      params.set('projectId', props.projectId)
+    }
+    fetch(`/api/assignment-candidates?${params}`)
       .then(r => r.json())
       .then(d => {
         setCandidates(d.candidates ?? [])
@@ -94,7 +105,7 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
         if (d.roles?.[0]) setRoleId(d.roles[0].id)
         setLoading(false)
       })
-  }, [props.workItemId, props.workItemType, props.projectId])
+  }, [props.workItemId, props.workItemType, props.projectId, props.isInternal, props.categoryId])
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -128,19 +139,22 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
     if (!selected || isNaN(numHours) || numHours <= 0 || !roleId) return
     setSaving(true)
     const numRate = parseFloat(rate)
+    const body: Record<string, unknown> = {
+      workItemType: props.workItemType,
+      workItemId: props.workItemId,
+      employeeId: selected.id,
+      roleId,
+      hours: numHours,
+      description: description || undefined,
+    }
+    if (!props.isInternal) {
+      if (!isNaN(numRate)) body.rate = numRate
+      if (props.projectId) body.projectId = props.projectId
+    }
     await fetch('/api/assignments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        workItemType: props.workItemType,
-        workItemId: props.workItemId,
-        employeeId: selected.id,
-        roleId,
-        hours: numHours,
-        description: description || undefined,
-        rate: !isNaN(numRate) ? numRate : undefined,
-        projectId: props.projectId,
-      }),
+      body: JSON.stringify(body),
     })
     setSaving(false)
     props.onSave()
@@ -195,18 +209,20 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
           </select>
         </div>
 
-        <div className={styles.field}>
-          <label className={styles.fieldLabel} htmlFor="flow-rate">HOURLY RATE FOR THIS PROJECT ($/HR)</label>
-          <input
-            id="flow-rate"
-            type="number"
-            min="0"
-            className={styles.input}
-            value={rate}
-            onChange={e => setRate(e.target.value)}
-          />
-          <div className={styles.rateNote}>Shared across all of {selected.name}&apos;s work on this project — editing it here updates it everywhere.</div>
-        </div>
+        {!props.isInternal && (
+          <div className={styles.field}>
+            <label className={styles.fieldLabel} htmlFor="flow-rate">HOURLY RATE FOR THIS PROJECT ($/HR)</label>
+            <input
+              id="flow-rate"
+              type="number"
+              min="0"
+              className={styles.input}
+              value={rate}
+              onChange={e => setRate(e.target.value)}
+            />
+            <div className={styles.rateNote}>Shared across all of {selected.name}&apos;s work on this project — editing it here updates it everywhere.</div>
+          </div>
+        )}
 
         <div className={styles.field}>
           <label className={styles.fieldLabel} htmlFor="flow-desc">DESCRIPTION</label>

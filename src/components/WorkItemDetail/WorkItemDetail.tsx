@@ -35,12 +35,14 @@ type ChildMember = { viaName: string } & TeamMember
 
 type DetailData = {
   type: 'phase' | 'task'
+  isInternal: boolean
   item: {
     id: string; name: string; startDate: string; endDate: string
     status: 'upcoming' | 'active' | 'complete'; requiredSkills: string[]
     completed?: boolean; dismissedSuggestions: string[]
   }
-  project: { id: string; name: string; startDate: string; endDate: string }
+  project: { id: string; name: string; startDate: string; endDate: string } | null
+  category: { id: string; name: string } | null
   projectSectorName: string | null
   ganttBars: GanttBar[]
   directAssignments: TeamMember[]
@@ -129,7 +131,6 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
-    // Dismiss the suggestion after adding
     await dismissSuggestion(suggestion.key)
   }
 
@@ -151,7 +152,9 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
         workItemType={props.workItemType}
         workItemStartDate={data.item.startDate}
         workItemEndDate={data.item.endDate}
-        projectId={data.project.id}
+        projectId={data.project?.id ?? null}
+        isInternal={data.isInternal}
+        categoryId={data.category?.id ?? null}
         onClose={() => setShowFlow(false)}
         onSave={() => { setShowFlow(false); load() }}
       />
@@ -162,21 +165,26 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
     return <div className={styles.loading}>Loading…</div>
   }
 
-  const { type, item, project, projectSectorName, ganttBars, directAssignments, childAssignments } = data
+  const { type, isInternal, item, project, category, projectSectorName, ganttBars, directAssignments, childAssignments } = data
   const suggestions = buildSuggestions(item, directAssignments, projectSectorName)
 
   return (
     <div className={styles.root}>
       <div className={styles.badges}>
-        <span className={styles.typeBadge}>{type.toUpperCase()}</span>
+        {isInternal && <span className={styles.internalBadge}>INTERNAL TASK</span>}
+        <span className={styles.typeBadge} data-internal={isInternal ? 'true' : undefined}>{type.toUpperCase()}</span>
         <span className={styles.statusBadge} style={{ color: STATUS_COLORS[item.status] }}>
           {STATUS_LABELS[item.status]}
         </span>
       </div>
 
-      <Link href={`/projects/${project.id}`} className={styles.projectLink}>
-        {project.name}
-      </Link>
+      {isInternal && category ? (
+        <span className={styles.categoryLabel}>{category.name}</span>
+      ) : project ? (
+        <Link href={`/projects/${project.id}`} className={styles.projectLink}>
+          {project.name}
+        </Link>
+      ) : null}
 
       <h2 className={styles.name}>{item.name}</h2>
       <div className={styles.dateRange}>{formatDateRange(item.startDate, item.endDate)}</div>
@@ -189,15 +197,17 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
         </div>
       )}
 
-      <div className={styles.miniGantt}>
-        <ProjectGantt
-          projectStartDate={project.startDate}
-          projectEndDate={project.endDate}
-          bars={ganttBars}
-          highlightId={item.id}
-          compact={true}
-        />
-      </div>
+      {!isInternal && project && ganttBars.length > 0 && (
+        <div className={styles.miniGantt}>
+          <ProjectGantt
+            projectStartDate={project.startDate}
+            projectEndDate={project.endDate}
+            bars={ganttBars}
+            highlightId={item.id}
+            compact={true}
+          />
+        </div>
+      )}
 
       {(directAssignments.length > 0 || childAssignments.length > 0) && (
         <div className={styles.section}>
