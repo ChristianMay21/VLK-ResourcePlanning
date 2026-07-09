@@ -11,6 +11,7 @@ type Candidate = {
   color: string | null
   jobTitle: string | null
   weeklyCapacity: number
+  baseHourlyRate: number
   availabilityPct: number
   sectorMatch: boolean
   skillsMatch: number
@@ -69,6 +70,7 @@ function capacityWarning(
 export default function AssignmentFlow(props: AssignmentFlowProps) {
   const [candidates, setCandidates] = useState<Candidate[]>([])
   const [roles, setRoles] = useState<Role[]>([])
+  const [empProjectRates, setEmpProjectRates] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [sortKey, setSortKey] = useState<SortKey>('availability')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
@@ -78,6 +80,7 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
   const [hours, setHours] = useState('')
   const [roleId, setRoleId] = useState('')
   const [description, setDescription] = useState('')
+  const [rate, setRate] = useState('')
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -87,6 +90,7 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
       .then(d => {
         setCandidates(d.candidates ?? [])
         setRoles(d.roles ?? [])
+        setEmpProjectRates(d.empProjectRates ?? {})
         if (d.roles?.[0]) setRoleId(d.roles[0].id)
         setLoading(false)
       })
@@ -114,9 +118,16 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
     ? capacityWarning(selected.assignmentsForUtil, numHours, props.workItemStartDate, props.workItemEndDate, selected.weeklyCapacity)
     : null
 
+  function handleSelectEmployee(emp: Candidate) {
+    setSelected(emp)
+    const projectRate = empProjectRates[emp.id]
+    setRate(String(projectRate ?? emp.baseHourlyRate))
+  }
+
   async function handleSave() {
     if (!selected || isNaN(numHours) || numHours <= 0 || !roleId) return
     setSaving(true)
+    const numRate = parseFloat(rate)
     await fetch('/api/assignments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -127,6 +138,8 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
         roleId,
         hours: numHours,
         description: description || undefined,
+        rate: !isNaN(numRate) ? numRate : undefined,
+        projectId: props.projectId,
       }),
     })
     setSaving(false)
@@ -180,6 +193,19 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
               <option key={r.id} value={r.id}>{r.name}</option>
             ))}
           </select>
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.fieldLabel} htmlFor="flow-rate">HOURLY RATE FOR THIS PROJECT ($/HR)</label>
+          <input
+            id="flow-rate"
+            type="number"
+            min="0"
+            className={styles.input}
+            value={rate}
+            onChange={e => setRate(e.target.value)}
+          />
+          <div className={styles.rateNote}>Shared across all of {selected.name}&apos;s work on this project — editing it here updates it everywhere.</div>
         </div>
 
         <div className={styles.field}>
@@ -241,7 +267,7 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
           {sorted.map(emp => {
             const utilColor = utilizationColor(emp.availabilityPct)
             return (
-              <tr key={emp.id} className={styles.candidateRow} onClick={() => setSelected(emp)}>
+              <tr key={emp.id} className={styles.candidateRow} onClick={() => handleSelectEmployee(emp)}>
                 <td className={styles.td}>
                   <div className={styles.candEmpCell}>
                     <span className={styles.empDot} style={{ background: emp.color ?? '#9a9484' }} />

@@ -4,10 +4,6 @@ import config from '@/payload.config'
 import type { Employee, Project, ProjectPhase, Role, Sector, Task } from '@/payload-types'
 import { rollingUtilizationPct } from '@/lib/utilization'
 
-function resolveId(val: string | { id: string }): string {
-  return typeof val === 'string' ? val : val.id
-}
-
 export async function GET(req: NextRequest) {
   const workItemId = req.nextUrl.searchParams.get('workItemId')
   const workItemType = req.nextUrl.searchParams.get('workItemType') as 'phase' | 'task' | null
@@ -41,17 +37,42 @@ export async function GET(req: NextRequest) {
   const wi = workItem as ProjectPhase | Task
   const requiredSkills = (wi.requiredSkills ?? []).map((s: { skill: string }) => s.skill)
 
-  // Build per-employee assignment map (for utilization)
+  // Build set of all work item IDs belonging to this project (for rate lookup)
+  const phaseIds = (proj.phases ?? []).map(
+    (p: string | { id: string }) => (typeof p === 'string' ? p : p.id),
+  )
+  const { docs: projectTasks } = phaseIds.length > 0
+    ? await payload.find({
+        collection: 'tasks',
+        where: { phase: { in: phaseIds } },
+        limit: 10000,
+        overrideAccess: true,
+      })
+    : { docs: [] }
+  const taskIds = projectTasks.map((t: { id: string }) => t.id)
+  const projectWorkItemIds = new Set([projectId, ...phaseIds, ...taskIds])
+
+  // Build per-employee assignment map (for utilization) and per-employee project rate
   const empAssignments: Record<string, { hours: number; startDate: string; endDate: string }[]> = {}
+  const empProjectRates: Record<string, number> = {}
+
   for (const assignment of allAssignments) {
     const emp = assignment.employee
     if (typeof emp !== 'object') continue
     const wv = assignment.workItem.value
     if (typeof wv !== 'object') continue
-    const wItem = wv as { startDate?: string; endDate?: string }
-    if (!wItem.startDate || !wItem.endDate) continue
-    if (!empAssignments[emp.id]) empAssignments[emp.id] = []
-    empAssignments[emp.id].push({ hours: assignment.hours, startDate: wItem.startDate, endDate: wItem.endDate })
+
+    const wItem = wv as { id?: string; startDate?: string; endDate?: string }
+
+    if (wItem.startDate && wItem.endDate) {
+      if (!empAssignments[emp.id]) empAssignments[emp.id] = []
+      empAssignments[emp.id].push({ hours: assignment.hours, startDate: wItem.startDate, endDate: wItem.endDate })
+    }
+
+    // Track the first rate found for this employee on any of the project's work items
+    if (wItem.id && projectWorkItemIds.has(wItem.id) && assignment.rate != null && empProjectRates[emp.id] == null) {
+      empProjectRates[emp.id] = assignment.rate
+    }
   }
 
   const today = new Date()
@@ -70,6 +91,7 @@ export async function GET(req: NextRequest) {
       color: emp.color ?? null,
       jobTitle: emp.jobTitle ?? null,
       weeklyCapacity: emp.maximumHours ?? 40,
+      baseHourlyRate: emp.baseHourlyRate ?? 150,
       availabilityPct,
       sectorMatch,
       skillsMatch,
@@ -78,12 +100,19 @@ export async function GET(req: NextRequest) {
     }
   })
 
-  const roleList = roles.map((r: Role) => ({ id: r.id, name: r.name }))
+  const collectionSlug = workItemType === 'phase' ? 'project-phases' : 'tasks'
+  const roleList = roles
+    .filter((r: Role) => {
+      const allowed = r.allowedOn ?? ['projects', 'project-phases', 'tasks']
+      return allowed.includes(collectionSlug as 'projects' | 'project-phases' | 'tasks')
+    })
+    .map((r: Role) => ({ id: r.id, name: r.name }))
 
   return NextResponse.json({
     requiredSkills,
     projectSectorName: sectorName,
     candidates,
+    empProjectRates,
     roles: roleList,
   })
 }

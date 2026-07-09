@@ -11,6 +11,7 @@ type EmployeeData = {
   color: string | null
   jobTitle: string | null
   capacity: number
+  baseHourlyRate: number | null
   assignments: AssignmentForUtil[]
 }
 
@@ -51,6 +52,7 @@ export default function EmployeeGrid(props: EmployeeGridProps) {
             color={emp.color}
             jobTitle={emp.jobTitle}
             capacity={emp.capacity}
+            baseHourlyRate={emp.baseHourlyRate}
             assignments={emp.assignments}
             windowWeeks={windowWeeks}
           />

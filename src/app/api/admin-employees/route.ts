@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
       jobTitle: body.jobTitle ?? undefined,
       manager: body.manager || undefined,
       maximumHours: body.maximumHours ?? 40,
+      baseHourlyRate: body.baseHourlyRate ?? 150,
       color: body.color ?? undefined,
       skills: body.skills ?? [],
       sectorExperience: body.sectorExperience ?? [],

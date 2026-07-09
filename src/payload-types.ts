@@ -205,6 +205,7 @@ export interface Employee {
   maximumHours: number;
   manager?: (string | null) | Employee;
   color?: string | null;
+  baseHourlyRate?: number | null;
   skills?:
     | {
         skill: string;
@@ -227,6 +228,7 @@ export interface Employee {
 export interface Role {
   id: string;
   name: string;
+  allowedOn: ('projects' | 'project-phases' | 'tasks')[];
   updatedAt: string;
   createdAt: string;
 }
@@ -325,6 +327,7 @@ export interface Assignment {
   role: string | Role;
   hours: number;
   description?: string | null;
+  rate?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -508,6 +511,7 @@ export interface EmployeesSelect<T extends boolean = true> {
   maximumHours?: T;
   manager?: T;
   color?: T;
+  baseHourlyRate?: T;
   skills?:
     | T
     | {
@@ -529,6 +533,7 @@ export interface EmployeesSelect<T extends boolean = true> {
  */
 export interface RolesSelect<T extends boolean = true> {
   name?: T;
+  allowedOn?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -610,6 +615,7 @@ export interface AssignmentsSelect<T extends boolean = true> {
   role?: T;
   hours?: T;
   description?: T;
+  rate?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -6,17 +6,32 @@ import { useDrawer } from '@/context/DrawerContext'
 import { getInitials } from '@/lib/dateUtils'
 import styles from './page.module.scss'
 
+const ALLOWED_ON_OPTIONS = [
+  { value: 'projects', label: 'Project' },
+  { value: 'project-phases', label: 'Phase' },
+  { value: 'tasks', label: 'Task' },
+] as const
+
+type AllowedOnValue = 'projects' | 'project-phases' | 'tasks'
+
+const TYPE_LABELS: Record<string, string> = {
+  projects: 'projects',
+  'project-phases': 'phases',
+  tasks: 'tasks',
+}
+
 type Employee = {
   id: string
   name: string
   jobTitle: string | null
   managerName: string | null
   capacity: number
+  baseHourlyRate: number | null
   color: string | null
 }
 
 type Client = { id: string; name: string }
-type Role = { id: string; name: string }
+type Role = { id: string; name: string; allowedOn: AllowedOnValue[] }
 type Sector = { id: string; name: string }
 type Skill = { id: string; name: string }
 
@@ -32,7 +47,9 @@ export default function AdminPage() {
   const [newClientName, setNewClientName] = useState('')
   const [editingRoleId, setEditingRoleId] = useState<string | null>(null)
   const [editingRoleName, setEditingRoleName] = useState('')
+  const [editingRoleAllowedOn, setEditingRoleAllowedOn] = useState<AllowedOnValue[]>(['projects', 'project-phases', 'tasks'])
   const [newRoleName, setNewRoleName] = useState('')
+  const [newRoleAllowedOn, setNewRoleAllowedOn] = useState<AllowedOnValue[]>(['projects', 'project-phases', 'tasks'])
   const [editingSectorId, setEditingSectorId] = useState<string | null>(null)
   const [editingSectorName, setEditingSectorName] = useState('')
   const [newSectorName, setNewSectorName] = useState('')
@@ -41,35 +58,42 @@ export default function AdminPage() {
   const [newSkillName, setNewSkillName] = useState('')
 
   const loadEmployees = useCallback(() => {
-    fetch('/api/employees?limit=200&depth=1').then(r => r.json()).then(d => {
+    fetch('/api/employees?limit=200&depth=1&sort=name').then(r => r.json()).then(d => {
       setEmployees((d.docs ?? []).map((e: {
         id: string; name: string; jobTitle?: string;
-        manager?: { name: string } | string; maximumHours: number; color?: string
+        manager?: { name: string } | string; maximumHours: number; baseHourlyRate?: number; color?: string
       }) => ({
         id: e.id,
         name: e.name,
         jobTitle: e.jobTitle ?? null,
         managerName: e.manager && typeof e.manager === 'object' ? e.manager.name : null,
         capacity: e.maximumHours,
+        baseHourlyRate: e.baseHourlyRate ?? null,
         color: e.color ?? null,
       })))
     })
   }, [])
 
   const loadClients = useCallback(() => {
-    fetch('/api/clients?limit=200').then(r => r.json()).then(d => setClients(d.docs ?? []))
+    fetch('/api/clients?limit=200&sort=name').then(r => r.json()).then(d => setClients(d.docs ?? []))
   }, [])
 
   const loadRoles = useCallback(() => {
-    fetch('/api/roles?limit=200').then(r => r.json()).then(d => setRoles(d.docs ?? []))
+    fetch('/api/roles?limit=200&sort=name').then(r => r.json()).then(d => {
+      setRoles((d.docs ?? []).map((r: { id: string; name: string; allowedOn?: AllowedOnValue[] | null }) => ({
+        id: r.id,
+        name: r.name,
+        allowedOn: r.allowedOn ?? (['projects', 'project-phases', 'tasks'] as AllowedOnValue[]),
+      })))
+    })
   }, [])
 
   const loadSectors = useCallback(() => {
-    fetch('/api/sectors?limit=200').then(r => r.json()).then(d => setSectors(d.docs ?? []))
+    fetch('/api/sectors?limit=200&sort=name').then(r => r.json()).then(d => setSectors(d.docs ?? []))
   }, [])
 
   const loadSkills = useCallback(() => {
-    fetch('/api/skills?limit=200').then(r => r.json()).then(d => setSkills(d.docs ?? []))
+    fetch('/api/skills?limit=200&sort=name').then(r => r.json()).then(d => setSkills(d.docs ?? []))
   }, [])
 
   useEffect(() => {
@@ -124,25 +148,70 @@ export default function AdminPage() {
   // Roles CRUD
   async function saveRole(id: string) {
     if (!editingRoleName.trim()) return
-    const res = await fetch(`/api/admin-roles/${id}`, {
+    if (editingRoleAllowedOn.length === 0) {
+      alert('At least one work item type must be selected.')
+      return
+    }
+
+    const doSave = async (force: boolean) => fetch(`/api/admin-roles/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: editingRoleName.trim() }),
+      body: JSON.stringify({ name: editingRoleName.trim(), allowedOn: editingRoleAllowedOn, force }),
     })
+
+    let res = await doSave(false)
+
+    if (res.status === 409) {
+      const data = await res.json()
+      if (data.conflict) {
+        const total = (data.conflicts as { type: string; count: number }[]).reduce((s, c) => s + c.count, 0)
+        const detail = (data.conflicts as { type: string; count: number }[])
+          .map(c => `${c.count} on ${TYPE_LABELS[c.type] ?? c.type}`)
+          .join(', ')
+        const ok = window.confirm(
+          `${total} assignment${total !== 1 ? 's' : ''} will be removed (${detail}) because those work item types are no longer allowed for this role. Are you sure?`
+        )
+        if (!ok) return
+        res = await doSave(true)
+      } else {
+        alert(data.error ?? 'Cannot save')
+        return
+      }
+    }
+
     if (!res.ok) {
       const data = await res.json()
       alert(data.error ?? 'Cannot save')
       return
     }
+
     setEditingRoleId(null)
     loadRoles()
   }
 
   async function deleteRole(id: string) {
-    const res = await fetch(`/api/admin-roles/${id}`, { method: 'DELETE' })
-    if (!res.ok) {
+    const doDelete = (force: boolean) =>
+      fetch(`/api/admin-roles/${id}${force ? '?force=true' : ''}`, { method: 'DELETE' })
+
+    let res = await doDelete(false)
+
+    if (res.status === 409) {
       const data = await res.json()
-      alert(data.error ?? 'Cannot delete')
+      if (data.conflict) {
+        const n = data.totalAssignments as number
+        const ok = window.confirm(
+          `${n} assignment${n !== 1 ? 's' : ''} use this role and will be removed along with it. Are you sure?`
+        )
+        if (!ok) return
+        res = await doDelete(true)
+      } else {
+        alert(data.error ?? 'Cannot delete')
+        return
+      }
+    }
+
+    if (!res.ok) {
+      alert('Failed to delete role.')
       return
     }
     loadRoles()
@@ -150,10 +219,14 @@ export default function AdminPage() {
 
   async function addRole() {
     if (!newRoleName.trim()) return
+    if (newRoleAllowedOn.length === 0) {
+      alert('At least one work item type must be selected.')
+      return
+    }
     const res = await fetch('/api/admin-roles', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newRoleName.trim() }),
+      body: JSON.stringify({ name: newRoleName.trim(), allowedOn: newRoleAllowedOn }),
     })
     if (!res.ok) {
       const data = await res.json()
@@ -161,7 +234,16 @@ export default function AdminPage() {
       return
     }
     setNewRoleName('')
+    setNewRoleAllowedOn(['projects', 'project-phases', 'tasks'])
     loadRoles()
+  }
+
+  function toggleAllowedOn(
+    value: AllowedOnValue,
+    current: AllowedOnValue[],
+    set: (v: AllowedOnValue[]) => void,
+  ) {
+    set(current.includes(value) ? current.filter(v => v !== value) : [...current, value])
   }
 
   // Sectors CRUD
@@ -255,6 +337,9 @@ export default function AdminPage() {
                 {emp.managerName && <span className={styles.empMeta}>Manager: {emp.managerName}</span>}
               </div>
               <span className={styles.empCapacity}>{emp.capacity} hrs/wk</span>
+              {emp.baseHourlyRate != null && (
+                <span className={styles.empRate}>${emp.baseHourlyRate.toLocaleString('en-US')}/hr</span>
+              )}
               <button type="button" className={styles.editBtn} onClick={() => openEditEmployee(emp.id)}>EDIT</button>
             </div>
           ))}
@@ -266,40 +351,83 @@ export default function AdminPage() {
         <h3 className={styles.sectionTitle}>Roles</h3>
         <div className={styles.list}>
           {roles.map(role => (
-            <div key={role.id} className={styles.listRow}>
+            <div key={role.id} className={styles.listRow} data-editing={editingRoleId === role.id ? 'true' : undefined}>
               {editingRoleId === role.id ? (
-                <>
-                  <input
-                    type="text"
-                    className={styles.inlineInput}
-                    value={editingRoleName}
-                    onChange={e => setEditingRoleName(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter') saveRole(role.id); if (e.key === 'Escape') setEditingRoleId(null) }}
-                    autoFocus
-                  />
-                  <button type="button" className={styles.saveBtn} onClick={() => saveRole(role.id)}>SAVE</button>
-                  <button type="button" className={styles.cancelBtn} onClick={() => setEditingRoleId(null)}>CANCEL</button>
-                </>
+                <div className={styles.roleEditBlock}>
+                  <div className={styles.roleEditTop}>
+                    <input
+                      type="text"
+                      className={styles.inlineInput}
+                      value={editingRoleName}
+                      onChange={e => setEditingRoleName(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Escape') setEditingRoleId(null) }}
+                      autoFocus
+                    />
+                    <button type="button" className={styles.saveBtn} onClick={() => saveRole(role.id)}>SAVE</button>
+                    <button type="button" className={styles.cancelBtn} onClick={() => setEditingRoleId(null)}>CANCEL</button>
+                  </div>
+                  <div className={styles.allowedOnRow}>
+                    <span className={styles.allowedOnLabel}>ALLOWED ON</span>
+                    {ALLOWED_ON_OPTIONS.map(opt => (
+                      <label key={opt.value} className={styles.allowedOnCheck}>
+                        <input
+                          type="checkbox"
+                          checked={editingRoleAllowedOn.includes(opt.value)}
+                          onChange={() => toggleAllowedOn(opt.value, editingRoleAllowedOn, setEditingRoleAllowedOn)}
+                        />
+                        {opt.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
               ) : (
                 <>
                   <span className={styles.itemName}>{role.name}</span>
-                  <button type="button" className={styles.editBtn} onClick={() => { setEditingRoleId(role.id); setEditingRoleName(role.name) }}>EDIT</button>
+                  <div className={styles.roleTags}>
+                    {role.allowedOn.map(t => (
+                      <span key={t} className={styles.roleTag}>
+                        {ALLOWED_ON_OPTIONS.find(o => o.value === t)?.label}
+                      </span>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.editBtn}
+                    onClick={() => { setEditingRoleId(role.id); setEditingRoleName(role.name); setEditingRoleAllowedOn(role.allowedOn) }}
+                  >
+                    EDIT
+                  </button>
                   <button type="button" className={styles.deleteBtn} onClick={() => deleteRole(role.id)}>DELETE</button>
                 </>
               )}
             </div>
           ))}
         </div>
-        <div className={styles.addRow}>
-          <input
-            type="text"
-            className={styles.inlineInput}
-            placeholder="New role name…"
-            value={newRoleName}
-            onChange={e => setNewRoleName(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') addRole() }}
-          />
-          <button type="button" className={styles.addBtn} onClick={addRole} disabled={!newRoleName.trim()}>ADD</button>
+        <div className={styles.addBlock}>
+          <div className={styles.addRow}>
+            <input
+              type="text"
+              className={styles.inlineInput}
+              placeholder="New role name…"
+              value={newRoleName}
+              onChange={e => setNewRoleName(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') addRole() }}
+            />
+            <button type="button" className={styles.addBtn} onClick={addRole} disabled={!newRoleName.trim() || newRoleAllowedOn.length === 0}>ADD</button>
+          </div>
+          <div className={styles.allowedOnRow}>
+            <span className={styles.allowedOnLabel}>ALLOWED ON</span>
+            {ALLOWED_ON_OPTIONS.map(opt => (
+              <label key={opt.value} className={styles.allowedOnCheck}>
+                <input
+                  type="checkbox"
+                  checked={newRoleAllowedOn.includes(opt.value)}
+                  onChange={() => toggleAllowedOn(opt.value, newRoleAllowedOn, setNewRoleAllowedOn)}
+                />
+                {opt.label}
+              </label>
+            ))}
+          </div>
         </div>
       </section>
 

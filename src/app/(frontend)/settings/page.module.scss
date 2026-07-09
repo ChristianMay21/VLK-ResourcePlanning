@@ -101,6 +101,14 @@
   flex-shrink: 0;
 }
 
+.empRate {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  color: $ink-soft;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .itemName {
   flex: 1;
   font-size: 14px;
@@ -192,6 +200,82 @@
   padding: 5px 9px;
   cursor: pointer;
   white-space: nowrap;
+}
+
+.roleTags {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.roleTag {
+  font-family: $font-plex-mono;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: $ink-soft;
+  border: 1px solid $line;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.listRow {
+  &[data-editing] {
+    align-items: stretch;
+    padding: 14px 0;
+  }
+}
+
+.roleEditBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.roleEditTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.addBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.allowedOnRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.allowedOnLabel {
+  font-family: $font-plex-mono;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.allowedOnCheck {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: $ink;
+  cursor: pointer;
+  white-space: nowrap;
+
+  input[type='checkbox'] {
+    accent-color: $blue;
+    width: 13px;
+    height: 13px;
+    cursor: pointer;
+  }
 }
 
 .deleteBtn {

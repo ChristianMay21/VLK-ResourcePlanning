@@ -105,6 +105,15 @@
   }
 }
 
+.rateNote {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: $ink-soft;
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
 .warning {
   font-family: $font-plex-mono;
   font-size: 11px;

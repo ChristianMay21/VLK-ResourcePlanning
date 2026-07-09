@@ -19,6 +19,7 @@ type EmployeeData = {
   name: string
   jobTitle: string | null
   maximumHours: number
+  baseHourlyRate: number
   color: string | null
   managerId: string | null
   skills: string[]
@@ -37,6 +38,7 @@ export default function EmployeeForm(props: EmployeeFormProps) {
   const [jobTitle, setJobTitle] = useState('')
   const [managerId, setManagerId] = useState('')
   const [capacity, setCapacity] = useState('40')
+  const [baseHourlyRate, setBaseHourlyRate] = useState('150')
   const [color, setColor] = useState(AVATAR_COLORS[0])
   const [skills, setSkills] = useState<string[]>([])
   const [sectorExp, setSectorExp] = useState<string[]>([])
@@ -63,6 +65,7 @@ export default function EmployeeForm(props: EmployeeFormProps) {
         setJobTitle(data.jobTitle ?? '')
         setManagerId(data.managerId ?? '')
         setCapacity(String(data.maximumHours))
+        setBaseHourlyRate(String(data.baseHourlyRate))
         setColor(data.color ?? AVATAR_COLORS[0])
         setSkills(data.skills)
         setSectorExp(data.sectorExperience)
@@ -88,6 +91,7 @@ export default function EmployeeForm(props: EmployeeFormProps) {
       jobTitle: jobTitle.trim() || undefined,
       manager: managerId || undefined,
       maximumHours: parseInt(capacity) || 40,
+      baseHourlyRate: parseFloat(baseHourlyRate) || 150,
       color,
       skills: skills.map(s => ({ skill: s })),
       sectorExperience: sectorExp.map(s => ({ sector: s })),
@@ -141,6 +145,11 @@ export default function EmployeeForm(props: EmployeeFormProps) {
       <div className={styles.field}>
         <label className={styles.label} htmlFor="ef-capacity">WEEKLY CAPACITY (HOURS)</label>
         <input id="ef-capacity" type="number" min="1" max="80" className={styles.input} value={capacity} onChange={e => setCapacity(e.target.value)} />
+      </div>
+
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="ef-rate">BASE HOURLY RATE ($/HR)</label>
+        <input id="ef-rate" type="number" min="0" className={styles.input} value={baseHourlyRate} onChange={e => setBaseHourlyRate(e.target.value)} />
       </div>
 
       <div className={styles.field}>

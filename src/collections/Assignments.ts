@@ -30,5 +30,9 @@ export const Assignments: CollectionConfig = {
       name: 'description',
       type: 'text',
     },
+    {
+      name: 'rate',
+      type: 'number',
+    },
   ],
 }

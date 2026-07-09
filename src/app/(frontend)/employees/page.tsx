@@ -10,6 +10,7 @@ type EmployeeGridData = {
   color: string | null
   jobTitle: string | null
   capacity: number
+  baseHourlyRate: number | null
   assignments: AssignmentForUtil[]
 }
 
@@ -39,6 +40,7 @@ export default async function EmployeesPage() {
     color: emp.color ?? null,
     jobTitle: emp.jobTitle ?? null,
     capacity: emp.maximumHours ?? 40,
+    baseHourlyRate: emp.baseHourlyRate ?? null,
     assignments: empAssignments[emp.id] ?? [],
   }))
 

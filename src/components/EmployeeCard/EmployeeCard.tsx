@@ -12,6 +12,7 @@ type EmployeeCardProps = {
   color: string | null
   jobTitle: string | null
   capacity: number
+  baseHourlyRate: number | null
   assignments: AssignmentForUtil[]
   windowWeeks: 4 | 8 | 12
 }
@@ -47,6 +48,9 @@ export default function EmployeeCard(props: EmployeeCardProps) {
           style={{ width: `${Math.min(pct, 100)}%`, background: color }}
         />
       </div>
+      {props.baseHourlyRate != null && (
+        <div className={styles.rate}>${props.baseHourlyRate.toLocaleString('en-US')}/hr</div>
+      )}
     </button>
   )
 }

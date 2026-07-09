@@ -39,6 +39,11 @@ export const Employees: CollectionConfig = {
       type: 'text',
     },
     {
+      name: 'baseHourlyRate',
+      type: 'number',
+      defaultValue: 150,
+    },
+    {
       name: 'skills',
       type: 'array',
       fields: [

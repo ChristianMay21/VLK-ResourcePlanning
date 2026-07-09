@@ -14,5 +14,17 @@ export const Roles: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    {
+      name: 'allowedOn',
+      type: 'select',
+      hasMany: true,
+      required: true,
+      defaultValue: ['projects', 'project-phases', 'tasks'],
+      options: [
+        { label: 'Project', value: 'projects' },
+        { label: 'Phase', value: 'project-phases' },
+        { label: 'Task', value: 'tasks' },
+      ],
+    },
   ],
 }
