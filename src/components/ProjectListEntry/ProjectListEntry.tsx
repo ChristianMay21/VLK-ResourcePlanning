@@ -5,6 +5,7 @@ import { useModal } from '@/context/ModalContext'
 import styles from './ProjectListEntry.module.scss'
 
 type ProjectListEntryProps = {
+  projectId: string
   name: string
   clientName: string
   budget: number
@@ -20,6 +21,7 @@ export default function ProjectListEntry(props: ProjectListEntryProps) {
     setModal({
       component: ProjectDetail,
       componentProps: {
+        projectId: props.projectId,
         name: props.name,
         budget: props.budget,
         isComplete: props.isComplete,

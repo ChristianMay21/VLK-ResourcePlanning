@@ -19,6 +19,7 @@ export default async function ProjectList(props: ProjectListProps) {
       {docs.map((project) => (
         <ProjectListEntry
           key={project.id}
+          projectId={project.id}
           name={project.name}
           clientName={typeof project.client === 'object' ? (project.client as Client).name : ''}
           budget={project.budget}

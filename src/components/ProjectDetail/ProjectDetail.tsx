@@ -1,6 +1,8 @@
+import ProjectAssignments from '@/components/ProjectAssignments/ProjectAssignments'
 import styles from './ProjectDetail.module.scss'
 
 type ProjectDetailProps = {
+  projectId: string
   name: string
   budget: number
   isComplete: boolean
@@ -25,6 +27,7 @@ export default function ProjectDetail(props: ProjectDetailProps) {
         <dt className={styles.label}>Status</dt>
         <dd className={styles.value}>{props.isComplete ? 'Complete' : 'In Progress'}</dd>
       </dl>
+      <ProjectAssignments projectId={props.projectId} />
     </div>
   )
 }

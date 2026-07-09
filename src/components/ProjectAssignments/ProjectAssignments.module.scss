@@ -1,2 +1,185 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
 .root {
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+  padding-top: $size-4;
+  border-top: 1px solid $gray-2;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+  font-family: $font-sans;
+  font-size: $font-size-2;
+  font-weight: $font-weight-6;
+  color: $gray-9;
+}
+
+.addButton {
+  background: none;
+  border: 1px solid $gray-4;
+  border-radius: 4px;
+  padding: $size-1 $size-2;
+  font-family: $font-sans;
+  font-size: $font-size-0;
+  color: $gray-7;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $gray-7;
+    color: $gray-9;
+  }
+}
+
+.empty {
+  margin: 0;
+  font-family: $font-sans;
+  font-size: $font-size-1;
+  color: $gray-5;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $size-1;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  align-items: center;
+  gap: $size-3;
+  padding: $size-2 0;
+  border-bottom: 1px solid $gray-2;
+}
+
+.role {
+  font-family: $font-sans;
+  font-size: $font-size-1;
+  color: $gray-9;
+}
+
+.employee {
+  font-family: $font-sans;
+  font-size: $font-size-1;
+  color: $gray-7;
+}
+
+.hours {
+  font-family: $font-sans;
+  font-size: $font-size-1;
+  color: $gray-6;
+}
+
+.actions {
+  display: flex;
+  gap: $size-2;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: $font-sans;
+  font-size: $font-size-0;
+  color: $gray-6;
+  cursor: pointer;
+
+  &:hover {
+    color: $gray-9;
+  }
+
+  &[data-variant='danger'] {
+    &:hover {
+      color: $red-6;
+    }
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+  padding: $size-3;
+  background-color: $gray-0;
+  border-radius: 6px;
+  border: 1px solid $gray-2;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $size-1;
+}
+
+.label {
+  font-family: $font-sans;
+  font-size: $font-size-0;
+  font-weight: $font-weight-6;
+  color: $gray-6;
+  letter-spacing: $font-letterspacing-2;
+  text-transform: uppercase;
+}
+
+.select {
+  font-family: $font-sans;
+  font-size: $font-size-1;
+  color: $gray-9;
+  padding: $size-1 $size-2;
+  border: 1px solid $gray-3;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.input {
+  font-family: $font-sans;
+  font-size: $font-size-1;
+  color: $gray-9;
+  padding: $size-1 $size-2;
+  border: 1px solid $gray-3;
+  border-radius: 4px;
+  width: 120px;
+}
+
+.formActions {
+  display: flex;
+  gap: $size-2;
+}
+
+.saveButton {
+  padding: $size-1 $size-3;
+  background-color: $gray-9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-family: $font-sans;
+  font-size: $font-size-1;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $gray-7;
+  }
+}
+
+.cancelButton {
+  padding: $size-1 $size-3;
+  background: none;
+  border: 1px solid $gray-3;
+  border-radius: 4px;
+  font-family: $font-sans;
+  font-size: $font-size-1;
+  color: $gray-7;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $gray-6;
+    color: $gray-9;
+  }
 }
