@@ -46,11 +46,13 @@ export default function ProjectAssignments(props: ProjectAssignmentsProps) {
   useEffect(() => {
     async function init() {
       const [rolesRes, employeesRes] = await Promise.all([
-        fetch('/api/roles'),
-        fetch('/api/employees'),
+        fetch('/api/roles?limit=100'),
+        fetch('/api/employees?limit=100'),
       ])
-      setRoles(await rolesRes.json())
-      setEmployees(await employeesRes.json())
+      const rolesData = await rolesRes.json()
+      const employeesData = await employeesRes.json()
+      setRoles(rolesData.docs)
+      setEmployees(employeesData.docs)
       await loadAssignments()
     }
     init()
