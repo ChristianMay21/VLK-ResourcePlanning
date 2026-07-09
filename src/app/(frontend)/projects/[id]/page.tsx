@@ -22,6 +22,8 @@ function assignmentCost(a: Assignment): number {
   return a.rate != null ? a.hours * a.rate : 0
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function ProjectDetailPage(props: { params: Promise<Params> }) {
   const { id } = await props.params
   const payload = await getPayload({ config: await config })

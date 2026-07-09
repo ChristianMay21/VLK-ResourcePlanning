@@ -24,6 +24,8 @@ type CategoryGroup = {
   tasks: TaskRow[]
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function InternalWorkPage() {
   const payload = await getPayload({ config: await config })
 

@@ -14,6 +14,8 @@ type EmployeeGridData = {
   assignments: AssignmentForUtil[]
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function EmployeesPage() {
   const payload = await getPayload({ config: await config })
 
