@@ -25,11 +25,13 @@ export async function POST(req: NextRequest) {
   }).catch(() => null) as Project | null
 
   if (parentProject) {
-    if (startDate < parentProject.startDate) {
-      return NextResponse.json({ error: `Start date cannot be before project start (${parentProject.startDate})` }, { status: 400 })
+    const projectStart = parentProject.startDate.slice(0, 10)
+    const projectEnd = parentProject.endDate.slice(0, 10)
+    if (startDate < projectStart) {
+      return NextResponse.json({ error: `Start date cannot be before project start (${projectStart})` }, { status: 400 })
     }
-    if (endDate > parentProject.endDate) {
-      return NextResponse.json({ error: `End date cannot be after project end (${parentProject.endDate})` }, { status: 400 })
+    if (endDate > projectEnd) {
+      return NextResponse.json({ error: `End date cannot be after project end (${projectEnd})` }, { status: 400 })
     }
   }
 

@@ -26,12 +26,14 @@ export default function TaskForm(props: TaskFormProps) {
 
   async function handleSave() {
     if (!name.trim() || !startDate || !endDate) return
-    if (props.phaseStartDate && startDate < props.phaseStartDate) {
-      setError(`Start date cannot be before phase start (${props.phaseStartDate})`)
+    const phaseStart = props.phaseStartDate?.slice(0, 10)
+    const phaseEnd = props.phaseEndDate?.slice(0, 10)
+    if (phaseStart && startDate < phaseStart) {
+      setError(`Start date cannot be before phase start (${phaseStart})`)
       return
     }
-    if (props.phaseEndDate && endDate > props.phaseEndDate) {
-      setError(`End date cannot be after phase end (${props.phaseEndDate})`)
+    if (phaseEnd && endDate > phaseEnd) {
+      setError(`End date cannot be after phase end (${phaseEnd})`)
       return
     }
     setSaving(true)

@@ -149,7 +149,10 @@ export default function EmployeeForm(props: EmployeeFormProps) {
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="ef-rate">BASE HOURLY RATE ($/HR)</label>
-        <input id="ef-rate" type="number" min="0" className={styles.input} value={baseHourlyRate} onChange={e => setBaseHourlyRate(e.target.value)} />
+        <div className={styles.moneyField}>
+          <span className={styles.moneyPrefix} aria-hidden="true">$</span>
+          <input id="ef-rate" type="number" min="0" className={styles.moneyInput} value={baseHourlyRate} onChange={e => setBaseHourlyRate(e.target.value)} />
+        </div>
       </div>
 
       <div className={styles.field}>

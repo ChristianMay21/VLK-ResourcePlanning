@@ -136,15 +136,8 @@
   flex-shrink: 0;
 }
 
-.avatar {
-  border-radius: 50%;
-  color: $paper;
-  font-family: $font-plex-mono;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.avatarItem {
   margin-left: -6px;
-  border: 1.5px solid $paper-dark;
   flex-shrink: 0;
 
   .taskRow & {

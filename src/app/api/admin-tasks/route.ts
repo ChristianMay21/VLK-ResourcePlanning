@@ -27,11 +27,13 @@ export async function POST(req: NextRequest) {
     }).catch(() => null) as ProjectPhase | null
 
     if (parentPhase) {
-      if (startDate < parentPhase.startDate) {
-        return NextResponse.json({ error: `Start date cannot be before phase start (${parentPhase.startDate})` }, { status: 400 })
+      const phaseStart = parentPhase.startDate.slice(0, 10)
+      const phaseEnd = parentPhase.endDate.slice(0, 10)
+      if (startDate < phaseStart) {
+        return NextResponse.json({ error: `Start date cannot be before phase start (${phaseStart})` }, { status: 400 })
       }
-      if (endDate > parentPhase.endDate) {
-        return NextResponse.json({ error: `End date cannot be after phase end (${parentPhase.endDate})` }, { status: 400 })
+      if (endDate > phaseEnd) {
+        return NextResponse.json({ error: `End date cannot be after phase end (${phaseEnd})` }, { status: 400 })
       }
     }
   }

@@ -34,24 +34,40 @@
   gap: 8px;
 }
 
-.dollarSign {
-  font-family: $font-plex-mono;
-  font-size: 13px;
-  color: $ink-soft;
-}
-
-.budgetInput {
-  width: 140px;
-  font-family: $font-plex-mono;
-  font-size: 14px;
+.budgetMoneyField {
+  display: flex;
+  align-items: stretch;
   border: 1px solid $line;
   background: $paper;
+
+  &:focus-within {
+    border-color: $blue;
+  }
+}
+
+.budgetMoneyPrefix {
+  font-family: $font-plex-mono;
+  font-size: 14px;
+  color: $ink-soft;
+  padding: 0 4px 0 10px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.budgetMoneyInput {
+  width: 120px;
+  font-family: $font-plex-mono;
+  font-size: 14px;
+  border: none;
+  background: transparent;
   color: $ink;
-  padding: 5px 8px;
+  padding: 5px 8px 5px 2px;
+  min-width: 0;
 
   &:focus {
-    outline: 1px solid $blue;
-    border-color: $blue;
+    outline: none;
   }
 }
 
@@ -336,13 +352,36 @@
   flex-shrink: 0;
 }
 
-.phaseInput {
-  width: 110px;
-  font-size: 13px;
-  padding: 5px 7px;
+.phaseMoneyField {
+  display: flex;
+  align-items: stretch;
   border: 1px solid $blue;
   background: $paper;
+
+  &:focus-within {
+    border-color: $blue;
+  }
+}
+
+.phaseMoneyPrefix {
+  font-family: $font-plex-mono;
+  font-size: 13px;
+  color: $ink-soft;
+  padding: 0 3px 0 8px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.phaseMoneyInput {
+  width: 90px;
+  font-size: 13px;
+  padding: 5px 7px 5px 2px;
+  border: none;
+  background: transparent;
   color: $ink;
+  min-width: 0;
 
   &:focus {
     outline: none;

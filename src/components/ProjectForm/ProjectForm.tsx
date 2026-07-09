@@ -39,7 +39,7 @@ export default function ProjectForm(props: ProjectFormProps) {
     })
   }, [])
 
-  const canSave = Boolean(name.trim() && clientId && startDate && endDate)
+  const canSave = Boolean(name.trim() && clientId && startDate && endDate && budget)
 
   async function handleSave() {
     if (!canSave) return
@@ -131,16 +131,18 @@ export default function ProjectForm(props: ProjectFormProps) {
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="pf-budget">BUDGET ($)</label>
-        <input
-          id="pf-budget"
-          type="number"
-          min="0"
-          step="1000"
-          className={styles.input}
-          value={budget}
-          onChange={e => setBudget(e.target.value)}
-          placeholder="Optional"
-        />
+        <div className={styles.moneyField}>
+          <span className={styles.moneyPrefix} aria-hidden="true">$</span>
+          <input
+            id="pf-budget"
+            type="number"
+            min="0"
+            step="1000"
+            className={styles.moneyInput}
+            value={budget}
+            onChange={e => setBudget(e.target.value)}
+          />
+        </div>
       </div>
 
       {error && <div className={styles.error}>{error}</div>}

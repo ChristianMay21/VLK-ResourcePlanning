@@ -35,13 +35,15 @@ export async function PATCH(req: NextRequest, context: { params: Promise<Params>
     }).catch(() => null) as ProjectPhase | null
 
     if (phase) {
-      const newStart = (body.startDate ?? task.startDate) as string
-      const newEnd = (body.endDate ?? task.endDate) as string
-      if (newStart < phase.startDate) {
-        return NextResponse.json({ error: `Start date cannot be before phase start (${phase.startDate})` }, { status: 400 })
+      const phaseStart = phase.startDate.slice(0, 10)
+      const phaseEnd = phase.endDate.slice(0, 10)
+      const newStart = ((body.startDate ?? task.startDate) as string).slice(0, 10)
+      const newEnd = ((body.endDate ?? task.endDate) as string).slice(0, 10)
+      if (newStart < phaseStart) {
+        return NextResponse.json({ error: `Start date cannot be before phase start (${phaseStart})` }, { status: 400 })
       }
-      if (newEnd > phase.endDate) {
-        return NextResponse.json({ error: `End date cannot be after phase end (${phase.endDate})` }, { status: 400 })
+      if (newEnd > phaseEnd) {
+        return NextResponse.json({ error: `End date cannot be after phase end (${phaseEnd})` }, { status: 400 })
       }
     }
   }

@@ -154,8 +154,8 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
   function openEdit() {
     if (!data) return
     setEditName(data.item.name)
-    setEditStart(data.item.startDate)
-    setEditEnd(data.item.endDate)
+    setEditStart(data.item.startDate.slice(0, 10))
+    setEditEnd(data.item.endDate.slice(0, 10))
     setEditError(null)
     setEditMode(true)
   }
@@ -164,21 +164,25 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
     if (!data || !editName.trim() || !editStart || !editEnd) return
 
     if (data.type === 'phase') {
-      if (data.project?.startDate && editStart < data.project.startDate) {
-        setEditError(`Start date cannot be before project start (${data.project.startDate})`)
+      const projectStart = data.project?.startDate?.slice(0, 10)
+      const projectEnd = data.project?.endDate?.slice(0, 10)
+      if (projectStart && editStart < projectStart) {
+        setEditError(`Start date cannot be before project start (${projectStart})`)
         return
       }
-      if (data.project?.endDate && editEnd > data.project.endDate) {
-        setEditError(`End date cannot be after project end (${data.project.endDate})`)
+      if (projectEnd && editEnd > projectEnd) {
+        setEditError(`End date cannot be after project end (${projectEnd})`)
         return
       }
     } else {
-      if (data.parentPhase?.startDate && editStart < data.parentPhase.startDate) {
-        setEditError(`Start date cannot be before phase start (${data.parentPhase.startDate})`)
+      const phaseStart = data.parentPhase?.startDate?.slice(0, 10)
+      const phaseEnd = data.parentPhase?.endDate?.slice(0, 10)
+      if (phaseStart && editStart < phaseStart) {
+        setEditError(`Start date cannot be before phase start (${phaseStart})`)
         return
       }
-      if (data.parentPhase?.endDate && editEnd > data.parentPhase.endDate) {
-        setEditError(`End date cannot be after phase end (${data.parentPhase.endDate})`)
+      if (phaseEnd && editEnd > phaseEnd) {
+        setEditError(`End date cannot be after phase end (${phaseEnd})`)
         return
       }
     }
@@ -374,6 +378,7 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
                 />
               </button>
               <div className={styles.memberInfo}>
+                <span className={styles.memberName}>{member.employeeName}</span>
                 {member.roleName && <span className={styles.memberRole}>{member.roleName}</span>}
                 {member.description && <span className={styles.memberDesc}>{member.description}</span>}
               </div>
@@ -417,6 +422,7 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
                 />
               </button>
               <div className={styles.memberInfo}>
+                <span className={styles.memberName}>{member.employeeName}</span>
                 {member.roleName && <span className={styles.memberRole}>{member.roleName}</span>}
                 <span className={styles.viaLabel}>via {member.viaName}</span>
               </div>

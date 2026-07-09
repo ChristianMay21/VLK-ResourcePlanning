@@ -6,8 +6,9 @@ import WorkItemDetail from '@/components/WorkItemDetail/WorkItemDetail'
 import PhaseForm from '@/components/PhaseForm/PhaseForm'
 import TaskForm from '@/components/TaskForm/TaskForm'
 import { useDrawer } from '@/context/DrawerContext'
+import UtilizationRing from '@/components/UtilizationRing/UtilizationRing'
 import styles from './PhaseList.module.scss'
-import { formatDateRange, getInitials } from '@/lib/dateUtils'
+import { formatDateRange } from '@/lib/dateUtils'
 
 type AvatarData = {
   id: string
@@ -65,23 +66,17 @@ function SkillTags(props: { skills: string[] }) {
   )
 }
 
-function AvatarStack(props: { avatars: AvatarData[]; size?: number }) {
-  const size = props.size ?? 24
+function AvatarStack(props: { avatars: AvatarData[] }) {
   return (
     <div className={styles.avatarStack}>
       {props.avatars.map(av => (
-        <span
-          key={av.id}
-          className={styles.avatar}
-          style={{
-            width: size,
-            height: size,
-            background: av.color ?? '#9a9484',
-            fontSize: size * 0.42,
-          }}
-          title={av.name}
-        >
-          {getInitials(av.name)}
+        <span key={av.id} className={styles.avatarItem}>
+          <UtilizationRing
+            size="xs"
+            pct={0}
+            name={av.name}
+            avatarColor={av.color ?? '#9a9484'}
+          />
         </span>
       ))}
     </div>
@@ -167,7 +162,7 @@ export default function PhaseList(props: PhaseListProps) {
               </div>
               <div className={styles.rowRight}>
                 <SkillTags skills={phase.requiredSkills} />
-                <AvatarStack avatars={phase.avatars} size={24} />
+                <AvatarStack avatars={phase.avatars} />
                 <button
                   className={styles.assignLink}
                   onClick={e => { e.stopPropagation(); openPhaseAssign(phase.id) }}
@@ -188,7 +183,7 @@ export default function PhaseList(props: PhaseListProps) {
                     </div>
                     <div className={styles.rowRight}>
                       <SkillTags skills={task.requiredSkills} />
-                      <AvatarStack avatars={task.avatars} size={20} />
+                      <AvatarStack avatars={task.avatars} />
                       <button
                         className={styles.assignLink}
                         onClick={e => { e.stopPropagation(); openTaskAssign(task.id) }}

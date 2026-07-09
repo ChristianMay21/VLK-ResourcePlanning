@@ -4,8 +4,9 @@ import config from '@/payload.config'
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  if (!body.name?.trim() || !body.clientId || !body.startDate || !body.endDate) {
-    return NextResponse.json({ error: 'Name, client, startDate, and endDate are required' }, { status: 400 })
+  const budget = body.budget != null ? parseFloat(body.budget) : NaN
+  if (!body.name?.trim() || !body.clientId || !body.startDate || !body.endDate || isNaN(budget) || budget < 0) {
+    return NextResponse.json({ error: 'Name, client, startDate, endDate, and budget are required' }, { status: 400 })
   }
 
   const payload = await getPayload({ config: await config })
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
       name: body.name.trim(),
       client: body.clientId,
       sector: body.sectorId || undefined,
-      budget: body.budget ?? undefined,
+      budget,
       startDate: body.startDate,
       endDate: body.endDate,
       isComplete: false,

@@ -111,15 +111,17 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
         <span className={styles.budgetLabel}>STAFF BUDGET</span>
         {editingBudget ? (
           <div className={styles.budgetEditInline}>
-            <span className={styles.dollarSign}>$</span>
-            <input
-              type="number"
-              min="0"
-              className={styles.budgetInput}
-              value={budgetDraft}
-              onChange={e => setBudgetDraft(e.target.value)}
-              autoFocus
-            />
+            <div className={styles.budgetMoneyField}>
+              <span className={styles.budgetMoneyPrefix}>$</span>
+              <input
+                type="number"
+                min="0"
+                className={styles.budgetMoneyInput}
+                value={budgetDraft}
+                onChange={e => setBudgetDraft(e.target.value)}
+                autoFocus
+              />
+            </div>
             <button type="button" className={styles.saveBtn} onClick={saveBudget} disabled={savingBudget}>
               {savingBudget ? 'SAVING…' : 'SAVE'}
             </button>
@@ -239,14 +241,17 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
                     )}
                     {isEditing ? (
                       <div className={styles.phaseEditGroup}>
-                        <input
-                          type="number"
-                          min="0"
-                          className={styles.phaseInput}
-                          value={phaseDraft}
-                          onChange={e => { setPhaseDraft(e.target.value); setPhaseError(null) }}
-                          autoFocus
-                        />
+                        <div className={styles.phaseMoneyField}>
+                          <span className={styles.phaseMoneyPrefix}>$</span>
+                          <input
+                            type="number"
+                            min="0"
+                            className={styles.phaseMoneyInput}
+                            value={phaseDraft}
+                            onChange={e => { setPhaseDraft(e.target.value); setPhaseError(null) }}
+                            autoFocus
+                          />
+                        </div>
                         <button
                           type="button"
                           className={styles.phaseActionBtn}

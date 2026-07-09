@@ -51,6 +51,44 @@
   }
 }
 
+.moneyField {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid $line;
+  background: $paper;
+  width: 100%;
+
+  &:focus-within {
+    border-color: $blue;
+  }
+}
+
+.moneyPrefix {
+  font-family: $font-plex-mono;
+  font-size: 14px;
+  color: $ink-soft;
+  padding: 0 4px 0 10px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.moneyInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px 8px 8px 2px;
+  font-family: $font-plex-sans;
+  font-size: 14px;
+  color: $ink;
+  min-width: 0;
+
+  &:focus {
+    outline: none;
+  }
+}
+
 .emptyNote {
   font-size: 13px;
   color: $ink-soft;

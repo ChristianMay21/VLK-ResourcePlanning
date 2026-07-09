@@ -289,14 +289,17 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
         {!props.isInternal && (
           <div className={styles.field}>
             <label className={styles.fieldLabel} htmlFor="flow-rate">HOURLY RATE FOR THIS WORK ($/HR)</label>
-            <input
-              id="flow-rate"
-              type="number"
-              min="0"
-              className={styles.input}
-              value={rate}
-              onChange={e => setRate(e.target.value)}
-            />
+            <div className={styles.moneyField}>
+              <span className={styles.moneyPrefix} aria-hidden="true">$</span>
+              <input
+                id="flow-rate"
+                type="number"
+                min="0"
+                className={styles.moneyInput}
+                value={rate}
+                onChange={e => setRate(e.target.value)}
+              />
+            </div>
             <div className={styles.rateNote}>Shared across all of {selected.name}&apos;s work on this project — editing it here updates it everywhere.</div>
           </div>
         )}

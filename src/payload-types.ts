@@ -253,7 +253,7 @@ export interface Project {
   name: string;
   client: string | Client;
   sector?: (string | null) | Sector;
-  budget?: number | null;
+  budget: number;
   isComplete?: boolean | null;
   phases?: (string | ProjectPhase)[] | null;
   startDate: string;

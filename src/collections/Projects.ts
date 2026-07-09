@@ -25,6 +25,7 @@ export const Projects: CollectionConfig = {
     {
       name: 'budget',
       type: 'number',
+      required: true,
     },
     {
       name: 'isComplete',
