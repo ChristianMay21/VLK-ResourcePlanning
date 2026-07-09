@@ -147,3 +147,46 @@
     text-decoration: underline;
   }
 }
+
+.addTaskRow {
+  padding: 6px 0 6px 40px;
+  border-bottom: 1px solid $line;
+}
+
+.addTaskBtn {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+  background: transparent;
+  border: 1px dashed $line;
+  padding: 4px 10px;
+  cursor: pointer;
+
+  &:hover {
+    color: $blue;
+    border-color: $blue;
+    border-style: solid;
+  }
+}
+
+.addPhaseRow {
+  padding: 14px 0;
+}
+
+.addPhaseBtn {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+  background: transparent;
+  border: 1px dashed $line;
+  padding: 7px 14px;
+  cursor: pointer;
+
+  &:hover {
+    color: $blue;
+    border-color: $blue;
+    border-style: solid;
+  }
+}

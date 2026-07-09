@@ -29,6 +29,32 @@ export async function GET(_req: NextRequest, context: { params: Promise<Params> 
   })
 }
 
+export async function DELETE(req: NextRequest, context: { params: Promise<Params> }) {
+  const { id } = await context.params
+  const force = req.nextUrl.searchParams.get('force') === 'true'
+  const payload = await getPayload({ config: await config })
+
+  const { docs: assignments, totalDocs } = await payload.find({
+    collection: 'assignments',
+    where: { employee: { equals: id } },
+    limit: force ? 10000 : 0,
+    overrideAccess: true,
+  })
+
+  if (totalDocs > 0 && !force) {
+    return NextResponse.json({ conflict: true, totalAssignments: totalDocs }, { status: 409 })
+  }
+
+  if (force) {
+    for (const a of assignments) {
+      await payload.delete({ collection: 'assignments', id: a.id, overrideAccess: true })
+    }
+  }
+
+  await payload.delete({ collection: 'employees', id, overrideAccess: true })
+  return NextResponse.json({ deleted: true })
+}
+
 export async function PATCH(req: NextRequest, context: { params: Promise<Params> }) {
   const { id } = await context.params
   const body = await req.json()

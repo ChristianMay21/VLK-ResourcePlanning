@@ -1,7 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import WorkItemDetail from '@/components/WorkItemDetail/WorkItemDetail'
+import PhaseForm from '@/components/PhaseForm/PhaseForm'
+import TaskForm from '@/components/TaskForm/TaskForm'
 import { useDrawer } from '@/context/DrawerContext'
 import styles from './PhaseList.module.scss'
 import { formatDateRange, getInitials } from '@/lib/dateUtils'
@@ -89,6 +92,7 @@ function AvatarStack(props: { avatars: AvatarData[]; size?: number }) {
 
 export default function PhaseList(props: PhaseListProps) {
   const { setDrawer } = useDrawer()
+  const router = useRouter()
   const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {}
     props.phases.forEach(p => { initial[p.id] = true })
@@ -101,6 +105,20 @@ export default function PhaseList(props: PhaseListProps) {
 
   function openTask(taskId: string) {
     setDrawer({ component: WorkItemDetail, componentProps: { workItemId: taskId, workItemType: 'task' } })
+  }
+
+  function openAddPhase() {
+    setDrawer({
+      component: PhaseForm,
+      componentProps: { projectId: props.projectId, onSave: () => router.refresh() },
+    })
+  }
+
+  function openAddTask(phase: PhaseData) {
+    setDrawer({
+      component: TaskForm,
+      componentProps: { phaseId: phase.id, phaseName: phase.name, onSave: () => router.refresh() },
+    })
   }
 
   return (
@@ -137,32 +155,50 @@ export default function PhaseList(props: PhaseListProps) {
               </button>
             </div>
           </div>
-          {expanded[phase.id] && phase.tasks.map(task => (
-            <div key={task.id} className={styles.taskRow} onClick={() => openTask(task.id)}>
-              <div className={styles.rowLeft}>
-                <span
-                  className={styles.statusDot}
-                  style={{ background: STATUS_COLORS[task.status], width: 6, height: 6 }}
-                />
-                <span className={styles.taskName}>{task.name}</span>
-                <span className={styles.dateRange}>{formatDateRange(task.startDate, task.endDate)}</span>
-              </div>
-              <div className={styles.rowRight}>
-                <SkillTags skills={task.requiredSkills} />
-                <AvatarStack avatars={task.avatars} size={20} />
+          {expanded[phase.id] && (
+            <>
+              {phase.tasks.map(task => (
+                <div key={task.id} className={styles.taskRow} onClick={() => openTask(task.id)}>
+                  <div className={styles.rowLeft}>
+                    <span
+                      className={styles.statusDot}
+                      style={{ background: STATUS_COLORS[task.status], width: 6, height: 6 }}
+                    />
+                    <span className={styles.taskName}>{task.name}</span>
+                    <span className={styles.dateRange}>{formatDateRange(task.startDate, task.endDate)}</span>
+                  </div>
+                  <div className={styles.rowRight}>
+                    <SkillTags skills={task.requiredSkills} />
+                    <AvatarStack avatars={task.avatars} size={20} />
+                    <button
+                      className={styles.assignLink}
+                      onClick={e => e.stopPropagation()}
+                      type="button"
+                      style={{ fontSize: 10 }}
+                    >
+                      + ASSIGN
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <div className={styles.addTaskRow}>
                 <button
-                  className={styles.assignLink}
-                  onClick={e => e.stopPropagation()}
                   type="button"
-                  style={{ fontSize: 10 }}
+                  className={styles.addTaskBtn}
+                  onClick={e => { e.stopPropagation(); openAddTask(phase) }}
                 >
-                  + ASSIGN
+                  + ADD TASK
                 </button>
               </div>
-            </div>
-          ))}
+            </>
+          )}
         </div>
       ))}
+      <div className={styles.addPhaseRow}>
+        <button type="button" className={styles.addPhaseBtn} onClick={openAddPhase}>
+          + ADD PHASE
+        </button>
+      </div>
     </div>
   )
 }

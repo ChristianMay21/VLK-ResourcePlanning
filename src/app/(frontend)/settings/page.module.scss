@@ -278,6 +278,38 @@
   }
 }
 
+.deleteConfirm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.deleteConfirmText {
+  flex: 1;
+  font-family: $font-plex-mono;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: $red;
+}
+
+.confirmDeleteBtn {
+  font-family: $font-plex-mono;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: $paper;
+  background: $red;
+  border: none;
+  padding: 5px 11px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
 .deleteBtn {
   font-family: $font-plex-mono;
   font-size: 9.5px;

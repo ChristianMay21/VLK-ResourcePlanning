@@ -1,6 +1,8 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import WorkItemDetail from '@/components/WorkItemDetail/WorkItemDetail'
+import TaskForm from '@/components/TaskForm/TaskForm'
 import { useDrawer } from '@/context/DrawerContext'
 import { formatDateRange } from '@/lib/dateUtils'
 import styles from './InternalWorkList.module.scss'
@@ -26,9 +28,17 @@ type InternalWorkListProps = {
 
 export default function InternalWorkList(props: InternalWorkListProps) {
   const { setDrawer } = useDrawer()
+  const router = useRouter()
 
   function openTask(taskId: string) {
     setDrawer({ component: WorkItemDetail, componentProps: { workItemId: taskId, workItemType: 'task' } })
+  }
+
+  function openAddTask(cat: CategoryGroup) {
+    setDrawer({
+      component: TaskForm,
+      componentProps: { categoryId: cat.id, categoryName: cat.name, onSave: () => router.refresh() },
+    })
   }
 
   if (props.categories.length === 0) {
@@ -46,6 +56,13 @@ export default function InternalWorkList(props: InternalWorkListProps) {
           <div className={styles.categoryHeader}>
             <h2 className={styles.categoryName}>{cat.name}</h2>
             <span className={styles.taskCount}>{cat.tasks.length} task{cat.tasks.length !== 1 ? 's' : ''}</span>
+            <button
+              type="button"
+              className={styles.addTaskBtn}
+              onClick={() => openAddTask(cat)}
+            >
+              + ADD TASK
+            </button>
           </div>
           {cat.tasks.length === 0 ? (
             <div className={styles.noTasks}>No tasks in this category yet.</div>

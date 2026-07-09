@@ -65,6 +65,7 @@ export default function AdminPage() {
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null)
   const [editingCategoryName, setEditingCategoryName] = useState('')
   const [newCategoryName, setNewCategoryName] = useState('')
+  const [empDeleteConfirm, setEmpDeleteConfirm] = useState<{ id: string; name: string; assignmentCount: number } | null>(null)
 
   const loadEmployees = useCallback(() => {
     fetch('/api/employees?limit=200&depth=1&sort=name').then(r => r.json()).then(d => {
@@ -124,6 +125,22 @@ export default function AdminPage() {
 
   function openEditEmployee(id: string) {
     setDrawer({ component: EmployeeForm, componentProps: { employeeId: id, onSave: loadEmployees } })
+  }
+
+  async function requestDeleteEmployee(id: string, name: string) {
+    const data = await fetch(`/api/assignments?employeeId=${id}`).then(r => r.json())
+    setEmpDeleteConfirm({ id, name, assignmentCount: data.totalDocs ?? 0 })
+  }
+
+  async function confirmDeleteEmployee() {
+    if (!empDeleteConfirm) return
+    const res = await fetch(`/api/admin-employees/${empDeleteConfirm.id}?force=true`, { method: 'DELETE' })
+    setEmpDeleteConfirm(null)
+    if (!res.ok) {
+      alert('Failed to delete employee.')
+      return
+    }
+    loadEmployees()
   }
 
   // Clients CRUD
@@ -380,26 +397,45 @@ export default function AdminPage() {
           <button type="button" className={styles.addBtn} onClick={openAddEmployee}>+ ADD EMPLOYEE</button>
         </div>
         <div className={styles.list}>
-          {employees.map(emp => (
-            <div key={emp.id} className={styles.listRow}>
-              <span
-                className={styles.empDot}
-                style={{ background: emp.color ?? '#9a9484' }}
-              >
-                {getInitials(emp.name)}
-              </span>
-              <div className={styles.empInfo}>
-                <span className={styles.empName}>{emp.name}</span>
-                {emp.jobTitle && <span className={styles.empMeta}>{emp.jobTitle}</span>}
-                {emp.managerName && <span className={styles.empMeta}>Manager: {emp.managerName}</span>}
+          {employees.map(emp => {
+            const isConfirming = empDeleteConfirm?.id === emp.id
+            return (
+              <div key={emp.id} className={styles.listRow} data-confirming={isConfirming ? 'true' : undefined}>
+                <span
+                  className={styles.empDot}
+                  style={{ background: emp.color ?? '#9a9484' }}
+                >
+                  {getInitials(emp.name)}
+                </span>
+                <div className={styles.empInfo}>
+                  <span className={styles.empName}>{emp.name}</span>
+                  {emp.jobTitle && <span className={styles.empMeta}>{emp.jobTitle}</span>}
+                  {emp.managerName && <span className={styles.empMeta}>Manager: {emp.managerName}</span>}
+                </div>
+                {isConfirming ? (
+                  <div className={styles.deleteConfirm}>
+                    <span className={styles.deleteConfirmText}>
+                      Remove {empDeleteConfirm.name}?
+                      {empDeleteConfirm.assignmentCount > 0 && (
+                        <> {empDeleteConfirm.assignmentCount} assignment{empDeleteConfirm.assignmentCount !== 1 ? 's' : ''} will also be removed.</>
+                      )}
+                    </span>
+                    <button type="button" className={styles.confirmDeleteBtn} onClick={confirmDeleteEmployee}>CONFIRM</button>
+                    <button type="button" className={styles.cancelBtn} onClick={() => setEmpDeleteConfirm(null)}>CANCEL</button>
+                  </div>
+                ) : (
+                  <>
+                    <span className={styles.empCapacity}>{emp.capacity} hrs/wk</span>
+                    {emp.baseHourlyRate != null && (
+                      <span className={styles.empRate}>${emp.baseHourlyRate.toLocaleString('en-US')}/hr</span>
+                    )}
+                    <button type="button" className={styles.editBtn} onClick={() => openEditEmployee(emp.id)}>EDIT</button>
+                    <button type="button" className={styles.deleteBtn} onClick={() => requestDeleteEmployee(emp.id, emp.name)}>DELETE</button>
+                  </>
+                )}
               </div>
-              <span className={styles.empCapacity}>{emp.capacity} hrs/wk</span>
-              {emp.baseHourlyRate != null && (
-                <span className={styles.empRate}>${emp.baseHourlyRate.toLocaleString('en-US')}/hr</span>
-              )}
-              <button type="button" className={styles.editBtn} onClick={() => openEditEmployee(emp.id)}>EDIT</button>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </section>
 

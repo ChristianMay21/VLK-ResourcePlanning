@@ -5,6 +5,8 @@ import type EmployeeDetail from '@/components/EmployeeDetail/EmployeeDetail'
 import type WorkItemDetail from '@/components/WorkItemDetail/WorkItemDetail'
 import type EmployeeForm from '@/components/EmployeeForm/EmployeeForm'
 import type ProjectForm from '@/components/ProjectForm/ProjectForm'
+import type PhaseForm from '@/components/PhaseForm/PhaseForm'
+import type TaskForm from '@/components/TaskForm/TaskForm'
 
 // DrawerState is a discriminated union — the type IS the registry.
 export type DrawerState =
@@ -12,6 +14,8 @@ export type DrawerState =
   | { component: typeof WorkItemDetail; componentProps: React.ComponentProps<typeof WorkItemDetail> }
   | { component: typeof EmployeeForm; componentProps: React.ComponentProps<typeof EmployeeForm> }
   | { component: typeof ProjectForm; componentProps: React.ComponentProps<typeof ProjectForm> }
+  | { component: typeof PhaseForm; componentProps: React.ComponentProps<typeof PhaseForm> }
+  | { component: typeof TaskForm; componentProps: React.ComponentProps<typeof TaskForm> }
 
 type DrawerContextType = {
   drawer: DrawerState | null

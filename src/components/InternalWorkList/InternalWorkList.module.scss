@@ -22,7 +22,7 @@
 
 .categoryHeader {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
   border-bottom: 2px solid $ink;
   padding-bottom: 8px;
@@ -42,6 +42,24 @@
   font-size: 10px;
   letter-spacing: 0.08em;
   color: $ink-soft;
+  flex: 1;
+}
+
+.addTaskBtn {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+  background: transparent;
+  border: 1px dashed $line;
+  padding: 4px 10px;
+  cursor: pointer;
+
+  &:hover {
+    color: #6b6558;
+    border-color: #6b6558;
+    border-style: solid;
+  }
 }
 
 .noTasks {

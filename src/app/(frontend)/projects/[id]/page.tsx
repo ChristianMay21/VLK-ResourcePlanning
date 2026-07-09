@@ -258,10 +258,7 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
 
       <section className={styles.section}>
         <h3 className={styles.sectionTitle}>Phases &amp; Tasks</h3>
-        {phaseListData.length > 0
-          ? <PhaseList phases={phaseListData} projectId={id} />
-          : <p className={styles.empty}>No phases yet.</p>
-        }
+        <PhaseList phases={phaseListData} projectId={id} />
       </section>
 
       <section className={styles.section}>

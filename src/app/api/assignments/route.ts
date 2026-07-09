@@ -51,6 +51,19 @@ async function syncProjectRate(
   }
 }
 
+export async function GET(req: NextRequest) {
+  const employeeId = req.nextUrl.searchParams.get('employeeId')
+  if (!employeeId) return NextResponse.json({ totalDocs: 0 })
+  const payload = await getPayload({ config: await config })
+  const { totalDocs } = await payload.find({
+    collection: 'assignments',
+    where: { employee: { equals: employeeId } },
+    limit: 0,
+    overrideAccess: true,
+  })
+  return NextResponse.json({ totalDocs })
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json()
   const { workItemType, workItemId, employeeId, roleId, hours, description, rate, projectId } = body
