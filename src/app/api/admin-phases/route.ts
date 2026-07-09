@@ -16,6 +16,23 @@ export async function POST(req: NextRequest) {
 
   const payload = await getPayload({ config: await config })
 
+  // Validate phase dates fall within project bounds
+  const parentProject = await payload.findByID({
+    collection: 'projects',
+    id: projectId,
+    depth: 0,
+    overrideAccess: true,
+  }).catch(() => null) as Project | null
+
+  if (parentProject) {
+    if (startDate < parentProject.startDate) {
+      return NextResponse.json({ error: `Start date cannot be before project start (${parentProject.startDate})` }, { status: 400 })
+    }
+    if (endDate > parentProject.endDate) {
+      return NextResponse.json({ error: `End date cannot be after project end (${parentProject.endDate})` }, { status: 400 })
+    }
+  }
+
   const phase = await payload.create({
     collection: 'project-phases',
     data: { name, startDate, endDate },

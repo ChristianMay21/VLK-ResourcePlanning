@@ -7,6 +7,8 @@ import styles from './TaskForm.module.scss'
 type TaskFormProps = {
   phaseId?: string
   phaseName?: string
+  phaseStartDate?: string
+  phaseEndDate?: string
   categoryId?: string
   categoryName?: string
   onSave: () => void
@@ -24,6 +26,14 @@ export default function TaskForm(props: TaskFormProps) {
 
   async function handleSave() {
     if (!name.trim() || !startDate || !endDate) return
+    if (props.phaseStartDate && startDate < props.phaseStartDate) {
+      setError(`Start date cannot be before phase start (${props.phaseStartDate})`)
+      return
+    }
+    if (props.phaseEndDate && endDate > props.phaseEndDate) {
+      setError(`End date cannot be after phase end (${props.phaseEndDate})`)
+      return
+    }
     setSaving(true)
     setError(null)
     const res = await fetch('/api/admin-tasks', {

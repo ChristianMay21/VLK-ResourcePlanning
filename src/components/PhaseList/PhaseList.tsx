@@ -41,6 +41,8 @@ type PhaseData = {
 type PhaseListProps = {
   phases: PhaseData[]
   projectId: string
+  projectStartDate: string
+  projectEndDate: string
 }
 
 const SKILL_CAP = 2
@@ -96,24 +98,43 @@ export default function PhaseList(props: PhaseListProps) {
   })
 
   function openPhase(phaseId: string) {
-    setDrawer({ component: WorkItemDetail, componentProps: { workItemId: phaseId, workItemType: 'phase' } })
+    setDrawer({ component: WorkItemDetail, componentProps: { workItemId: phaseId, workItemType: 'phase', onAssignmentChange: () => router.refresh() } })
   }
 
   function openTask(taskId: string) {
-    setDrawer({ component: WorkItemDetail, componentProps: { workItemId: taskId, workItemType: 'task' } })
+    setDrawer({ component: WorkItemDetail, componentProps: { workItemId: taskId, workItemType: 'task', onAssignmentChange: () => router.refresh() } })
+  }
+
+  function openPhaseAssign(phaseId: string) {
+    setDrawer({ component: WorkItemDetail, componentProps: { workItemId: phaseId, workItemType: 'phase', openAssign: true, onAssignmentChange: () => router.refresh() } })
+  }
+
+  function openTaskAssign(taskId: string) {
+    setDrawer({ component: WorkItemDetail, componentProps: { workItemId: taskId, workItemType: 'task', openAssign: true, onAssignmentChange: () => router.refresh() } })
   }
 
   function openAddPhase() {
     setDrawer({
       component: PhaseForm,
-      componentProps: { projectId: props.projectId, onSave: () => router.refresh() },
+      componentProps: {
+        projectId: props.projectId,
+        projectStartDate: props.projectStartDate,
+        projectEndDate: props.projectEndDate,
+        onSave: () => router.refresh(),
+      },
     })
   }
 
   function openAddTask(phase: PhaseData) {
     setDrawer({
       component: TaskForm,
-      componentProps: { phaseId: phase.id, phaseName: phase.name, onSave: () => router.refresh() },
+      componentProps: {
+        phaseId: phase.id,
+        phaseName: phase.name,
+        phaseStartDate: phase.startDate,
+        phaseEndDate: phase.endDate,
+        onSave: () => router.refresh(),
+      },
     })
   }
 
@@ -149,7 +170,7 @@ export default function PhaseList(props: PhaseListProps) {
                 <AvatarStack avatars={phase.avatars} size={24} />
                 <button
                   className={styles.assignLink}
-                  onClick={e => e.stopPropagation()}
+                  onClick={e => { e.stopPropagation(); openPhaseAssign(phase.id) }}
                   type="button"
                 >
                   + ASSIGN
@@ -170,7 +191,7 @@ export default function PhaseList(props: PhaseListProps) {
                       <AvatarStack avatars={task.avatars} size={20} />
                       <button
                         className={styles.assignLink}
-                        onClick={e => e.stopPropagation()}
+                        onClick={e => { e.stopPropagation(); openTaskAssign(task.id) }}
                         type="button"
                         style={{ fontSize: 10 }}
                       >

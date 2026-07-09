@@ -6,6 +6,8 @@ import styles from './PhaseForm.module.scss'
 
 type PhaseFormProps = {
   projectId: string
+  projectStartDate?: string
+  projectEndDate?: string
   onSave: () => void
 }
 
@@ -19,6 +21,14 @@ export default function PhaseForm(props: PhaseFormProps) {
 
   async function handleSave() {
     if (!name.trim() || !startDate || !endDate) return
+    if (props.projectStartDate && startDate < props.projectStartDate) {
+      setError(`Start date cannot be before project start (${props.projectStartDate})`)
+      return
+    }
+    if (props.projectEndDate && endDate > props.projectEndDate) {
+      setError(`End date cannot be after project end (${props.projectEndDate})`)
+      return
+    }
     setSaving(true)
     setError(null)
     const res = await fetch('/api/admin-phases', {

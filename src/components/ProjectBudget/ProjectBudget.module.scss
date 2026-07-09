@@ -4,6 +4,8 @@
   margin-bottom: 32px;
 }
 
+// ── STAFF BUDGET header ──────────────────────────────────────────────────────
+
 .budgetRow {
   display: flex;
   align-items: baseline;
@@ -13,7 +15,7 @@
 
 .budgetLabel {
   font-family: $font-plex-mono;
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.1em;
   color: $ink-soft;
   flex-shrink: 0;
@@ -46,21 +48,6 @@
   background: $paper;
   color: $ink;
   padding: 5px 8px;
-
-  &:focus {
-    outline: 1px solid $blue;
-    border-color: $blue;
-  }
-}
-
-.phaseInput {
-  width: 110px;
-  font-family: $font-plex-mono;
-  font-size: 13px;
-  border: 1px solid $line;
-  background: $paper;
-  color: $ink;
-  padding: 4px 7px;
 
   &:focus {
     outline: 1px solid $blue;
@@ -114,6 +101,8 @@
   }
 }
 
+// ── ALLOCATED / UNALLOCATED summary ─────────────────────────────────────────
+
 .summaryRow {
   display: flex;
   align-items: stretch;
@@ -160,20 +149,39 @@
   color: $ink-soft;
 }
 
+// ── BUDGET ALLOCATION BY PHASE box ──────────────────────────────────────────
+
+.allocationBox {
+  border: 1px solid $line;
+  background: $paper-dark;
+  padding: 18px 20px 22px;
+  margin-bottom: 28px;
+}
+
+.allocationTitle {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: $ink-soft;
+  margin-bottom: 14px;
+}
+
+// ── Stacked bar ─────────────────────────────────────────────────────────────
+
 .bar {
   display: flex;
   height: 30px;
+  width: 100%;
   border: 1px solid $line;
   overflow: hidden;
-  margin-bottom: 8px;
 }
 
 .barSegment {
   height: 100%;
-  background: var(--seg-color);
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
+  border-right: 1px solid $paper-dark;
 }
 
 .barSpent {
@@ -184,24 +192,38 @@
   background: rgba($ink, 0.16);
 }
 
+.barLabel {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  color: $paper;
+  white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .barUnallocated {
   height: 100%;
   background-image: repeating-linear-gradient(
-    -45deg,
-    rgba($ink, 0.08),
-    rgba($ink, 0.08) 2px,
-    transparent 2px,
-    transparent 8px
+    45deg,
+    $line,
+    $line 3px,
+    $paper 3px,
+    $paper 6px
   );
-  background-color: $paper-dark;
-  border-left: 1px solid $line;
   flex-shrink: 0;
 }
 
+// ── Legend ───────────────────────────────────────────────────────────────────
+
 .legend {
   display: flex;
-  gap: 20px;
-  margin-bottom: 16px;
+  gap: 16px;
+  margin-top: 10px;
+  flex-wrap: wrap;
 }
 
 .legendItem {
@@ -211,42 +233,43 @@
   font-family: $font-plex-mono;
   font-size: 10px;
   color: $ink-soft;
-  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .legendSpent {
-  width: 14px;
-  height: 10px;
-  background: rgba($ink, 0.3);
-  border: 1px solid $line;
+  width: 8px;
+  height: 8px;
+  background: rgba($ink, 0.16);
+  display: inline-block;
   flex-shrink: 0;
 }
 
 .legendAlloc {
-  width: 14px;
-  height: 10px;
-  background: $blue;
+  width: 8px;
+  height: 8px;
+  background: $ink-soft;
+  display: inline-block;
   flex-shrink: 0;
 }
 
 .legendUnalloc {
-  width: 14px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   background-image: repeating-linear-gradient(
-    -45deg,
-    rgba($ink, 0.08),
-    rgba($ink, 0.08) 2px,
-    transparent 2px,
-    transparent 8px
+    45deg,
+    $line,
+    $line 3px,
+    $paper 3px,
+    $paper 6px
   );
-  background-color: $paper-dark;
-  border: 1px solid $line;
+  display: inline-block;
   flex-shrink: 0;
 }
 
+// ── Phase rows ───────────────────────────────────────────────────────────────
+
 .phaseRows {
-  border: 1px solid $line;
-  background: $paper-dark;
+  margin-top: 18px;
 }
 
 .phaseRow {
@@ -261,76 +284,108 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 9px 0;
 }
 
 .phaseDot {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: var(--dot-color);
   flex-shrink: 0;
 }
 
 .phaseName {
-  font-size: 13px;
-  font-weight: 500;
-  color: $ink;
-  min-width: 0;
   flex: 1;
+  font-size: 13.5px;
+  color: $ink;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.phaseMeta {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-shrink: 0;
+  min-width: 0;
 }
 
 .phasePct {
   font-family: $font-plex-mono;
-  font-size: 11px;
+  font-size: 11.5px;
   color: $ink-soft;
-  letter-spacing: 0.04em;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .phaseCost {
   font-family: $font-plex-mono;
-  font-size: 11px;
+  font-size: 11.5px;
   color: $ink-soft;
-  letter-spacing: 0.04em;
   white-space: nowrap;
-}
-
-.phaseAllocCell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   flex-shrink: 0;
-  margin-left: auto;
 }
 
 .phaseAllocValue {
   font-family: $font-plex-mono;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: $ink;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .phaseEditGroup {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.phaseInput {
+  width: 110px;
+  font-size: 13px;
+  padding: 5px 7px;
+  border: 1px solid $blue;
+  background: $paper;
+  color: $ink;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.phaseActionBtn {
+  font-family: $font-plex-mono;
+  font-size: 10.5px;
+  color: $blue;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  &:hover:not(:disabled) {
+    text-decoration: underline;
+  }
+}
+
+.phaseCancelBtn {
+  font-family: $font-plex-mono;
+  font-size: 10.5px;
+  color: $ink-soft;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    color: $ink;
+  }
 }
 
 .phaseError {
-  padding: 4px 14px 8px 35px;
-  font-family: $font-plex-mono;
-  font-size: 10.5px;
+  font-size: 12px;
   color: $red;
+  padding: 4px 0 4px 21px;
 }

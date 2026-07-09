@@ -56,6 +56,7 @@ export async function GET(req: NextRequest, context: { params: Promise<Params> }
 
   let project: Project | null = null
   let category: InternalWorkCategory | null = null
+  let parentPhase: { id: string; startDate: string; endDate: string } | null = null
 
   if (isInternalTask) {
     const task = workItemResult as Task
@@ -67,7 +68,11 @@ export async function GET(req: NextRequest, context: { params: Promise<Params> }
     const task = workItemResult as Task
     const phaseVal = task.phase
     const phaseId = phaseVal ? resolveId(phaseVal as string | ProjectPhase) : null
-    if (phaseId) project = phaseToProject[phaseId] ?? null
+    if (phaseId) {
+      project = phaseToProject[phaseId] ?? null
+      const ph = allPhases.find(p => p.id === phaseId)
+      if (ph) parentPhase = { id: ph.id, startDate: ph.startDate, endDate: ph.endDate }
+    }
   }
 
   if (!isInternalTask && !project) {
@@ -216,6 +221,7 @@ export async function GET(req: NextRequest, context: { params: Promise<Params> }
     project: project
       ? { id: project.id, name: project.name, startDate: project.startDate, endDate: project.endDate }
       : null,
+    parentPhase,
     category: category ? { id: category.id, name: category.name } : null,
     projectSectorName,
     ganttBars,

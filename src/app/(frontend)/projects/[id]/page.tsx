@@ -282,7 +282,6 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
         projectId={id}
         budget={projectBudget}
         phases={phaseBudgetData}
-        totalCost={totalCost}
       />
 
       {ganttBars.length > 0 && (
@@ -295,7 +294,12 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
 
       <section className={styles.section}>
         <h3 className={styles.sectionTitle}>Phases &amp; Tasks</h3>
-        <PhaseList phases={phaseListData} projectId={id} />
+        <PhaseList
+          phases={phaseListData}
+          projectId={id}
+          projectStartDate={project.startDate}
+          projectEndDate={project.endDate}
+        />
       </section>
 
       <section className={styles.section}>

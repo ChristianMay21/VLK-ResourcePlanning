@@ -288,7 +288,7 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
 
         {!props.isInternal && (
           <div className={styles.field}>
-            <label className={styles.fieldLabel} htmlFor="flow-rate">HOURLY RATE FOR THIS PROJECT ($/HR)</label>
+            <label className={styles.fieldLabel} htmlFor="flow-rate">HOURLY RATE FOR THIS WORK ($/HR)</label>
             <input
               id="flow-rate"
               type="number"

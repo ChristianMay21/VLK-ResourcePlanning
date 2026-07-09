@@ -24,7 +24,6 @@ type ProjectBudgetProps = {
   projectId: string
   budget: number | null
   phases: PhaseBudgetData[]
-  totalCost: number
 }
 
 export default function ProjectBudget(props: ProjectBudgetProps) {
@@ -107,6 +106,7 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
 
   return (
     <div className={styles.root}>
+      {/* STAFF BUDGET header */}
       <div className={styles.budgetRow}>
         <span className={styles.budgetLabel}>STAFF BUDGET</span>
         {editingBudget ? (
@@ -135,20 +135,13 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
         )}
       </div>
 
+      {/* ALLOCATED / UNALLOCATED summary */}
       {budget != null && (
         <div className={styles.summaryRow}>
           <div className={styles.summaryCell}>
-            <span className={styles.summaryCellLabel}>COST TO DATE</span>
-            <span className={styles.summaryCellValue}>{fmtMoney(props.totalCost)}</span>
-            {budget > 0 && (
-              <span className={styles.summaryCellPct}>{pctOf((props.totalCost / budget) * 100)} of budget</span>
-            )}
-          </div>
-          <div className={styles.summaryCellDivider} />
-          <div className={styles.summaryCell}>
             <span className={styles.summaryCellLabel}>ALLOCATED</span>
             <span className={styles.summaryCellValue}>{fmtMoney(totalAllocated)}</span>
-            {budget > 0 && <span className={styles.summaryCellPct}>{pctOf(allocatedPct)}</span>}
+            {budget > 0 && <span className={styles.summaryCellPct}>({pctOf(allocatedPct)})</span>}
           </div>
           <div className={styles.summaryCellDivider} />
           <div className={styles.summaryCell}>
@@ -161,90 +154,91 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
               {totalUnallocated != null && totalUnallocated < 0 && ' over'}
             </span>
             {budget > 0 && totalUnallocated != null && (
-              <span className={styles.summaryCellPct}>{pctOf(Math.abs(unallocatedPct))}</span>
+              <span className={styles.summaryCellPct}>({pctOf(Math.abs(unallocatedPct))})</span>
             )}
           </div>
         </div>
       )}
 
-      {budget != null && budget > 0 && (
-        <>
-          <div className={styles.bar}>
-            {props.phases.map((phase, i) => {
-              const alloc = allocations[phase.id] ?? 0
-              if (alloc <= 0) return null
-              const widthPct = (alloc / budget) * 100
-              const spentPct = Math.min((phase.cost / alloc) * 100, 100)
-              return (
-                <div
-                  key={phase.id}
-                  className={styles.barSegment}
-                  style={{
-                    width: `${widthPct}%`,
-                    '--seg-color': PHASE_COLORS[i % PHASE_COLORS.length],
-                  } as React.CSSProperties}
-                  title={`${phase.name}: ${fmtMoney(alloc)} allocated, ${fmtMoney(phase.cost)} spent`}
-                >
-                  <div className={styles.barSpent} style={{ width: `${spentPct}%` }} />
-                </div>
-              )
-            })}
-            {totalUnallocated != null && totalUnallocated > 0 && (
-              <div
-                className={styles.barUnallocated}
-                style={{ width: `${(totalUnallocated / budget) * 100}%` }}
-                title="Unallocated"
-              />
-            )}
-          </div>
-
-          <div className={styles.legend}>
-            <span className={styles.legendItem}>
-              <span className={styles.legendSpent} />
-              Spent within allocation
-            </span>
-            <span className={styles.legendItem}>
-              <span className={styles.legendAlloc} />
-              Phase allocation
-            </span>
-            <span className={styles.legendItem}>
-              <span className={styles.legendUnalloc} />
-              Unallocated
-            </span>
-          </div>
-        </>
-      )}
-
+      {/* BUDGET ALLOCATION BY PHASE — single bordered box */}
       {props.phases.length > 0 && (
-        <div className={styles.phaseRows}>
-          {props.phases.map((phase, i) => {
-            const color = PHASE_COLORS[i % PHASE_COLORS.length]
-            const alloc = allocations[phase.id]
-            const pct = budget != null && budget > 0 && alloc != null
-              ? (alloc / budget) * 100
-              : null
-            const isEditing = editingPhase === phase.id
+        <div className={styles.allocationBox}>
+          <div className={styles.allocationTitle}>BUDGET ALLOCATION BY PHASE</div>
 
-            return (
-              <div key={phase.id} className={styles.phaseRow}>
-                <div className={styles.phaseRowMain}>
-                  <span
-                    className={styles.phaseDot}
-                    style={{ '--dot-color': color } as React.CSSProperties}
+          {budget != null && budget > 0 && (
+            <>
+              {/* Stacked bar */}
+              <div className={styles.bar}>
+                {props.phases.map((phase, i) => {
+                  const alloc = allocations[phase.id] ?? 0
+                  if (alloc <= 0) return null
+                  const widthPct = (alloc / budget) * 100
+                  const spentPct = Math.min((phase.cost / alloc) * 100, 100)
+                  const color = PHASE_COLORS[i % PHASE_COLORS.length]
+                  return (
+                    <div
+                      key={phase.id}
+                      className={styles.barSegment}
+                      style={{ width: `${widthPct}%`, background: color } as React.CSSProperties}
+                      title={`${phase.name}: ${fmtMoney(alloc)} allocated, ${fmtMoney(phase.cost)} spent`}
+                    >
+                      <div className={styles.barSpent} style={{ width: `${spentPct}%` }} />
+                      {widthPct > 8 && (
+                        <span className={styles.barLabel}>{phase.name}</span>
+                      )}
+                    </div>
+                  )
+                })}
+                {totalUnallocated != null && totalUnallocated > 0 && (
+                  <div
+                    className={styles.barUnallocated}
+                    style={{ width: `${(totalUnallocated / budget) * 100}%` }}
+                    title="Unallocated"
                   />
-                  <span className={styles.phaseName}>{phase.name}</span>
-                  <div className={styles.phaseMeta}>
+                )}
+              </div>
+
+              {/* Legend */}
+              <div className={styles.legend}>
+                <span className={styles.legendItem}>
+                  <span className={styles.legendSpent} />
+                  Spent within allocation
+                </span>
+                <span className={styles.legendItem}>
+                  <span className={styles.legendAlloc} />
+                  Direct project-level cost
+                </span>
+                <span className={styles.legendItem}>
+                  <span className={styles.legendUnalloc} />
+                  Unallocated
+                </span>
+              </div>
+            </>
+          )}
+
+          {/* Phase rows */}
+          <div className={styles.phaseRows}>
+            {props.phases.map((phase, i) => {
+              const color = PHASE_COLORS[i % PHASE_COLORS.length]
+              const alloc = allocations[phase.id]
+              const pct = budget != null && budget > 0 && alloc != null
+                ? (alloc / budget) * 100
+                : null
+              const isEditing = editingPhase === phase.id
+
+              return (
+                <div key={phase.id} className={styles.phaseRow}>
+                  <div className={styles.phaseRowMain}>
+                    <span className={styles.phaseDot} style={{ background: color }} />
+                    <span className={styles.phaseName}>{phase.name}</span>
                     {pct != null && (
                       <span className={styles.phasePct}>{pctOf(pct)} of budget</span>
                     )}
                     {phase.cost > 0 && (
                       <span className={styles.phaseCost}>cost {fmtMoney(phase.cost)}</span>
                     )}
-                  </div>
-                  <div className={styles.phaseAllocCell}>
                     {isEditing ? (
                       <div className={styles.phaseEditGroup}>
-                        <span className={styles.dollarSign}>$</span>
                         <input
                           type="number"
                           min="0"
@@ -255,7 +249,7 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
                         />
                         <button
                           type="button"
-                          className={styles.saveBtn}
+                          className={styles.phaseActionBtn}
                           onClick={() => savePhaseAllocation(phase.id)}
                           disabled={savingPhase}
                         >
@@ -263,7 +257,7 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
                         </button>
                         <button
                           type="button"
-                          className={styles.cancelBtn}
+                          className={styles.phaseCancelBtn}
                           onClick={() => { setEditingPhase(null); setPhaseError(null) }}
                         >
                           CANCEL
@@ -276,7 +270,7 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
                         </span>
                         <button
                           type="button"
-                          className={styles.editBtn}
+                          className={styles.phaseActionBtn}
                           onClick={() => startEditPhase(phase)}
                         >
                           EDIT
@@ -284,13 +278,13 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
                       </>
                     )}
                   </div>
+                  {isEditing && phaseError && (
+                    <div className={styles.phaseError}>{phaseError}</div>
+                  )}
                 </div>
-                {isEditing && phaseError && (
-                  <div className={styles.phaseError}>{phaseError}</div>
-                )}
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       )}
     </div>

@@ -18,14 +18,18 @@ export async function PATCH(req: NextRequest, context: { params: Promise<Params>
 
   if (!phase) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const budgetAllocation = body.budgetAllocation != null ? Number(body.budgetAllocation) : null
+  const data: Record<string, unknown> = {}
+  if (body.budgetAllocation != null) data.budgetAllocation = Number(body.budgetAllocation)
+  if (body.name != null) data.name = String(body.name).trim()
+  if (body.startDate != null) data.startDate = body.startDate
+  if (body.endDate != null) data.endDate = body.endDate
 
   const updated = await payload.update({
     collection: 'project-phases',
     id,
-    data: { budgetAllocation: budgetAllocation ?? undefined },
+    data,
     overrideAccess: true,
   })
 
-  return NextResponse.json({ id: updated.id, budgetAllocation: updated.budgetAllocation ?? null })
+  return NextResponse.json({ id: updated.id })
 }
