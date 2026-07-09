@@ -41,7 +41,6 @@ export const Employees: CollectionConfig = {
     {
       name: 'baseHourlyRate',
       type: 'number',
-      defaultValue: 150,
     },
     {
       name: 'skills',

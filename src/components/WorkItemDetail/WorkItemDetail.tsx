@@ -24,8 +24,10 @@ type TeamMember = {
   employeeId: string
   employeeName: string
   employeeColor: string | null
+  roleId: string
   roleName: string
   hours: number
+  rate: number | null
   description: string | null
   skills: string[]
   sectorExperience: string[]
@@ -89,7 +91,7 @@ function buildSuggestions(
 export default function WorkItemDetail(props: WorkItemDetailProps) {
   const { setDrawer } = useDrawer()
   const [data, setData] = useState<DetailData | null>(null)
-  const [showFlow, setShowFlow] = useState(false)
+  const [flowMode, setFlowMode] = useState<'add' | TeamMember | null>(null)
   const [toggling, setToggling] = useState(false)
 
   const load = useCallback(() => {
@@ -145,7 +147,8 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
     load()
   }
 
-  if (showFlow && data) {
+  if (flowMode !== null && data) {
+    const editing = typeof flowMode === 'object' ? flowMode : null
     return (
       <AssignmentFlow
         workItemId={props.workItemId}
@@ -155,8 +158,19 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
         projectId={data.project?.id ?? null}
         isInternal={data.isInternal}
         categoryId={data.category?.id ?? null}
-        onClose={() => setShowFlow(false)}
-        onSave={() => { setShowFlow(false); load() }}
+        editingAssignment={editing ? {
+          assignmentId: editing.assignmentId,
+          employeeId: editing.employeeId,
+          employeeName: editing.employeeName,
+          employeeColor: editing.employeeColor,
+          jobTitle: null,
+          roleId: editing.roleId,
+          hours: String(editing.hours),
+          description: editing.description ?? '',
+          rate: editing.rate != null ? String(editing.rate) : '',
+        } : undefined}
+        onClose={() => setFlowMode(null)}
+        onSave={() => { setFlowMode(null); load() }}
       />
     )
   }
@@ -232,6 +246,13 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
                   <button
                     type="button"
                     className={styles.actionBtn}
+                    onClick={() => setFlowMode(member)}
+                  >
+                    EDIT
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.actionBtn}
                     data-destructive="true"
                     onClick={() => removeAssignment(member.assignmentId)}
                   >
@@ -281,7 +302,7 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
       )}
 
       <div className={styles.actions}>
-        <button type="button" className={styles.assignBtn} onClick={() => setShowFlow(true)}>
+        <button type="button" className={styles.assignBtn} onClick={() => setFlowMode('add')}>
           + ASSIGN EMPLOYEE
         </button>
         {type === 'task' && (

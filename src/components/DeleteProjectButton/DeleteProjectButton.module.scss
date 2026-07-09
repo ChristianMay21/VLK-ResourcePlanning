@@ -1,0 +1,82 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  display: contents;
+}
+
+.deleteBtn {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: $red;
+  background: transparent;
+  border: 1px solid rgba(181, 67, 47, 0.25);
+  padding: 6px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: $red;
+    background: rgba(181, 67, 47, 0.06);
+  }
+}
+
+.confirm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(181, 67, 47, 0.3);
+  background: rgba(181, 67, 47, 0.04);
+}
+
+.confirmText {
+  font-family: $font-plex-mono;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  color: $red;
+  flex: 1;
+  min-width: 0;
+}
+
+.confirmBtn {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: $paper;
+  background: $red;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    opacity: 0.85;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.cancelBtn {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+  background: transparent;
+  border: 1px solid $line;
+  padding: 6px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    border-color: $ink-soft;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

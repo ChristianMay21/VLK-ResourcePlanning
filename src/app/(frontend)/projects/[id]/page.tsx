@@ -6,6 +6,7 @@ import type { Assignment, Employee, Project, ProjectPhase, Role, Sector, Task } 
 import ProjectGantt from '@/components/ProjectGantt/ProjectGantt'
 import PhaseList from '@/components/PhaseList/PhaseList'
 import UtilizationRing from '@/components/UtilizationRing/UtilizationRing'
+import DeleteProjectButton from '@/components/DeleteProjectButton/DeleteProjectButton'
 import { formatDateRange, deriveStatus } from '@/lib/dateUtils'
 import { rollingUtilizationPct, type AssignmentForUtil } from '@/lib/utilization'
 import styles from './page.module.scss'
@@ -240,6 +241,7 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
       <div className={styles.pageHeader}>
         <h2 className={styles.projectName}>{project.name}</h2>
         <div className={styles.headerMeta}>
+          <DeleteProjectButton projectId={id} projectName={project.name} />
           {sectorName && <span className={styles.sectorBadge}>{sectorName}</span>}
           <span className={styles.dateRange}>{formatDateRange(project.startDate, project.endDate)}</span>
           {project.budget != null && (

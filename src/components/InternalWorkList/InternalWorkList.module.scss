@@ -1,9 +1,29 @@
 @use '../../app/styles/design-system/index.scss' as *;
 
 .root {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
+  max-width: $page-max-width;
+  margin: 0 auto;
+  padding: 40px $page-padding 80px;
+}
+
+.pageHeader {
+  margin-bottom: 36px;
+}
+
+.pageTitle {
+  margin: 0 0 10px;
+  font-family: $font-newsreader;
+  font-size: 26px;
+  font-weight: 500;
+  color: $ink;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: $ink-soft;
+  max-width: 640px;
+  line-height: 1.55;
 }
 
 .empty {
@@ -15,33 +35,29 @@
 }
 
 .category {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  margin-bottom: 26px;
 }
 
 .categoryHeader {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 2px solid $ink;
-  padding-bottom: 8px;
-  margin-bottom: 0;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 10px;
 }
 
 .categoryName {
   margin: 0;
   font-family: $font-newsreader;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
   color: $ink;
 }
 
-.taskCount {
+.categoryMeta {
   font-family: $font-plex-mono;
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: 11px;
   color: $ink-soft;
+  letter-spacing: 0.04em;
   flex: 1;
 }
 
@@ -49,17 +65,22 @@
   font-family: $font-plex-mono;
   font-size: 10px;
   letter-spacing: 0.08em;
-  color: $ink-soft;
+  color: $blue;
   background: transparent;
-  border: 1px dashed $line;
+  border: 1px dashed rgba($blue, 0.4);
   padding: 4px 10px;
   cursor: pointer;
+  flex-shrink: 0;
 
   &:hover {
-    color: #6b6558;
-    border-color: #6b6558;
     border-style: solid;
+    border-color: $blue;
   }
+}
+
+.taskCard {
+  border: 1px solid $line;
+  background: $paper-dark;
 }
 
 .noTasks {
@@ -67,74 +88,122 @@
   font-size: 11px;
   letter-spacing: 0.04em;
   color: $ink-soft;
-  padding: 16px 0;
-  border-bottom: 1px solid $line;
-}
-
-.taskList {
-  display: flex;
-  flex-direction: column;
+  padding: 16px 18px;
 }
 
 .taskRow {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0;
+  justify-content: space-between;
+  padding: 12px 18px;
   border-bottom: 1px solid $line;
-  background: transparent;
-  border-left: none;
-  border-right: none;
-  border-top: none;
-  text-align: left;
   cursor: pointer;
-  width: 100%;
+  gap: 16px;
 
-  &:hover {
-    background: rgba(0, 0, 0, 0.02);
+  &:last-child {
+    border-bottom: none;
   }
 
-  &[data-complete] {
-    opacity: 0.6;
+  &:hover {
+    background: color-mix(in srgb, $ink 6%, $paper-dark);
   }
 }
 
-.taskStatus {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #6b6558;
-  flex-shrink: 0;
+.taskLeft {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
 
-  &[data-complete] {
-    background: $green;
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: $gray-neutral;
+
+  &[data-status='upcoming'] {
+    background: $status-upcoming;
+  }
+
+  &[data-status='active'] {
+    background: $status-active;
+  }
+
+  &[data-status='complete'] {
+    background: $status-complete;
   }
 }
 
 .taskName {
-  font-family: $font-newsreader;
-  font-size: 15px;
+  font-size: 14px;
   color: $ink;
-  flex: 1;
-  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .taskDates {
   font-family: $font-plex-mono;
-  font-size: 10px;
-  letter-spacing: 0.04em;
+  font-size: 12.5px;
   color: $ink-soft;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-.taskAssigned {
+.taskRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.avatarStack {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid $paper-dark;
+  background: var(--avatar-color, #{$gray-neutral});
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-plex-mono;
+  font-size: 7px;
+  font-weight: 500;
+  color: $paper;
+  flex-shrink: 0;
+  letter-spacing: 0;
+
+  &:not(:first-child) {
+    margin-left: -5px;
+  }
+}
+
+.taskHours {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  color: $ink-soft;
+  white-space: nowrap;
+}
+
+.assignBtn {
   font-family: $font-plex-mono;
   font-size: 10px;
-  letter-spacing: 0.04em;
-  color: #6b6558;
-  border: 1px solid rgba(107, 101, 88, 0.3);
-  padding: 2px 6px;
+  letter-spacing: 0.05em;
+  color: $blue;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   white-space: nowrap;
-  flex-shrink: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }

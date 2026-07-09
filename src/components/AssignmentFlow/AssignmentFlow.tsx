@@ -11,7 +11,7 @@ type Candidate = {
   color: string | null
   jobTitle: string | null
   weeklyCapacity: number
-  baseHourlyRate: number
+  baseHourlyRate: number | null
   availabilityPct: number
   sectorMatch: boolean
   skillsMatch: number
@@ -21,6 +21,18 @@ type Candidate = {
 
 type Role = { id: string; name: string }
 
+type EditingAssignment = {
+  assignmentId: string
+  employeeId: string
+  employeeName: string
+  employeeColor: string | null
+  jobTitle: string | null
+  roleId: string
+  hours: string
+  description: string
+  rate: string
+}
+
 type AssignmentFlowProps = {
   workItemId: string
   workItemType: 'phase' | 'task'
@@ -29,6 +41,7 @@ type AssignmentFlowProps = {
   projectId: string | null
   isInternal?: boolean
   categoryId?: string | null
+  editingAssignment?: EditingAssignment
   onClose: () => void
   onSave: () => void
 }
@@ -99,13 +112,39 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
     fetch(`/api/assignment-candidates?${params}`)
       .then(r => r.json())
       .then(d => {
-        setCandidates(d.candidates ?? [])
-        setRoles(d.roles ?? [])
-        setEmpProjectRates(d.empProjectRates ?? {})
-        if (d.roles?.[0]) setRoleId(d.roles[0].id)
+        const candidateList: Candidate[] = d.candidates ?? []
+        const roleList: Role[] = d.roles ?? []
+        const rateMap: Record<string, number> = d.empProjectRates ?? {}
+        setCandidates(candidateList)
+        setRoles(roleList)
+        setEmpProjectRates(rateMap)
+
+        if (props.editingAssignment) {
+          const ea = props.editingAssignment
+          const match = candidateList.find(c => c.id === ea.employeeId)
+          setSelected(match ?? {
+            id: ea.employeeId,
+            name: ea.employeeName,
+            color: ea.employeeColor,
+            jobTitle: ea.jobTitle,
+            weeklyCapacity: 40,
+            baseHourlyRate: null,
+            availabilityPct: 0,
+            sectorMatch: false,
+            skillsMatch: 0,
+            skillsTotal: 0,
+            assignmentsForUtil: [],
+          })
+          setHours(ea.hours)
+          setRoleId(ea.roleId)
+          setDescription(ea.description)
+          setRate(ea.rate)
+        } else if (roleList[0]) {
+          setRoleId(roleList[0].id)
+        }
         setLoading(false)
       })
-  }, [props.workItemId, props.workItemType, props.projectId, props.isInternal, props.categoryId])
+  }, [props.workItemId, props.workItemType, props.projectId, props.isInternal, props.categoryId, props.editingAssignment])
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -132,30 +171,50 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
   function handleSelectEmployee(emp: Candidate) {
     setSelected(emp)
     const projectRate = empProjectRates[emp.id]
-    setRate(String(projectRate ?? emp.baseHourlyRate))
+    const fallback = projectRate ?? emp.baseHourlyRate
+    setRate(fallback != null ? String(fallback) : '')
   }
 
   async function handleSave() {
     if (!selected || isNaN(numHours) || numHours <= 0 || !roleId) return
     setSaving(true)
     const numRate = parseFloat(rate)
-    const body: Record<string, unknown> = {
-      workItemType: props.workItemType,
-      workItemId: props.workItemId,
-      employeeId: selected.id,
-      roleId,
-      hours: numHours,
-      description: description || undefined,
+
+    if (props.editingAssignment) {
+      const body: Record<string, unknown> = {
+        roleId,
+        hours: numHours,
+        description: description || undefined,
+        employeeId: selected.id,
+      }
+      if (!props.isInternal) {
+        if (!isNaN(numRate)) body.rate = numRate
+        if (props.projectId) body.projectId = props.projectId
+      }
+      await fetch(`/api/assignments/${props.editingAssignment.assignmentId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+    } else {
+      const body: Record<string, unknown> = {
+        workItemType: props.workItemType,
+        workItemId: props.workItemId,
+        employeeId: selected.id,
+        roleId,
+        hours: numHours,
+        description: description || undefined,
+      }
+      if (!props.isInternal) {
+        if (!isNaN(numRate)) body.rate = numRate
+        if (props.projectId) body.projectId = props.projectId
+      }
+      await fetch('/api/assignments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
     }
-    if (!props.isInternal) {
-      if (!isNaN(numRate)) body.rate = numRate
-      if (props.projectId) body.projectId = props.projectId
-    }
-    await fetch('/api/assignments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
     setSaving(false)
     props.onSave()
   }
@@ -168,8 +227,8 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
     return (
       <div className={styles.root}>
         <div className={styles.flowHeader}>
-          <button type="button" className={styles.backBtn} onClick={() => setSelected(null)}>‹ BACK</button>
-          <span className={styles.flowTitle}>CONFIGURE ASSIGNMENT</span>
+          <button type="button" className={styles.backBtn} onClick={() => props.editingAssignment ? props.onClose() : setSelected(null)}>‹ BACK</button>
+          <span className={styles.flowTitle}>{props.editingAssignment ? 'EDIT ASSIGNMENT' : 'CONFIGURE ASSIGNMENT'}</span>
         </div>
 
         <div className={styles.selectedEmp}>
@@ -247,7 +306,7 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
             onClick={handleSave}
             disabled={saving || isNaN(numHours) || numHours <= 0 || !roleId}
           >
-            {saving ? 'SAVING…' : 'CONFIRM ASSIGNMENT'}
+            {saving ? 'SAVING…' : props.editingAssignment ? 'SAVE CHANGES' : 'CONFIRM ASSIGNMENT'}
           </button>
           <button type="button" className={styles.cancelBtn} onClick={props.onClose}>
             CANCEL

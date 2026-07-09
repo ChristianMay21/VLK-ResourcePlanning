@@ -100,7 +100,7 @@ export async function GET(req: NextRequest) {
       color: emp.color ?? null,
       jobTitle: emp.jobTitle ?? null,
       weeklyCapacity: emp.maximumHours ?? 40,
-      baseHourlyRate: emp.baseHourlyRate ?? 150,
+      baseHourlyRate: emp.baseHourlyRate ?? null,
       availabilityPct,
       sectorMatch,
       skillsMatch,

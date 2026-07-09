@@ -15,8 +15,10 @@ type TeamMember = {
   employeeId: string
   employeeName: string
   employeeColor: string | null
+  roleId: string
   roleName: string
   hours: number
+  rate: number | null
   description: string | null
   skills: string[]
   sectorExperience: string[]
@@ -131,8 +133,10 @@ export async function GET(req: NextRequest, context: { params: Promise<Params> }
       employeeId: e.id,
       employeeName: e.name,
       employeeColor: e.color ?? null,
+      roleId: typeof role === 'object' ? (role as Role).id : '',
       roleName: typeof role === 'object' ? (role as Role).name : '',
       hours: doc.hours,
+      rate: doc.rate ?? null,
       description: doc.description ?? null,
       skills: (e.skills ?? []).map(s => s.skill),
       sectorExperience: (e.sectorExperience ?? []).map(s => s.sector),

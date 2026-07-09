@@ -21,7 +21,7 @@ export async function GET(_req: NextRequest, context: { params: Promise<Params> 
     name: emp.name,
     jobTitle: emp.jobTitle ?? null,
     maximumHours: emp.maximumHours,
-    baseHourlyRate: emp.baseHourlyRate ?? 150,
+    baseHourlyRate: emp.baseHourlyRate ?? null,
     color: emp.color ?? null,
     managerId: emp.manager && typeof emp.manager === 'string' ? emp.manager : null,
     skills: (emp.skills ?? []).map(s => s.skill),
