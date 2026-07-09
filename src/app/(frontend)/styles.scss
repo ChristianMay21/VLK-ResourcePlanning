@@ -36,6 +36,17 @@ ol[role='list'] {
 body {
   min-height: 100vh;
   line-height: 1.5;
+  font-family: var(--font-plex-sans), 'IBM Plex Sans', sans-serif;
+  color: #211f1a;
+  background-color: #f1ece1;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(33, 31, 26, 0.045) 32px),
+    repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(33, 31, 26, 0.045) 32px);
+}
+
+::selection {
+  background: #2c4a6e;
+  color: #f1ece1;
 }
 
 /* Set shorter line heights on headings and interactive elements */

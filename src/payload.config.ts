@@ -14,8 +14,12 @@ import { Employees } from './collections/Employees'
 import { ProjectPhases } from './collections/ProjectPhases'
 import { Projects } from './collections/Projects'
 import { Roles } from './collections/Roles'
-import { ProjectRoleAssignments } from './collections/ProjectRoleAssignments'
+import { Sectors } from './collections/Sectors'
+import { Tasks } from './collections/Tasks'
+import { Assignments } from './collections/Assignments'
+import { Skills } from './collections/Skills'
 import { Settings } from './collections/Settings'
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -26,7 +30,19 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Clients, Employees, Projects, ProjectPhases, Roles, ProjectRoleAssignments],
+  collections: [
+    Users,
+    Media,
+    Clients,
+    Employees,
+    Roles,
+    Sectors,
+    Projects,
+    ProjectPhases,
+    Tasks,
+    Assignments,
+    Skills,
+  ],
   globals: [Settings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

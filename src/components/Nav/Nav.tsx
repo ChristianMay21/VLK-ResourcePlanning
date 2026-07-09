@@ -8,9 +8,19 @@ export default function Nav() {
   const pathname = usePathname()
 
   return (
-    <nav className={styles.root}>
-      <Link className={styles.link} href="/projects" data-active={pathname === '/projects'}>Projects</Link>
-      <Link className={styles.link} href="/staff" data-active={pathname === '/staff'}>Staff</Link>
-    </nav>
+    <header className={styles.root}>
+      <span className={styles.wordmark}>Workload Planner</span>
+      <nav className={styles.nav}>
+        <Link className={styles.tab} href="/projects" data-active={pathname.startsWith('/projects')}>
+          PROJECTS
+        </Link>
+        <Link className={styles.tab} href="/employees" data-active={pathname.startsWith('/employees')}>
+          EMPLOYEES
+        </Link>
+        <Link className={styles.tab} href="/settings" data-active={pathname.startsWith('/settings')}>
+          ADMIN
+        </Link>
+      </nav>
+    </header>
   )
 }

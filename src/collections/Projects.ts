@@ -18,20 +18,18 @@ export const Projects: CollectionConfig = {
       required: true,
     },
     {
+      name: 'sector',
+      type: 'relationship',
+      relationTo: 'sectors',
+    },
+    {
       name: 'budget',
       type: 'number',
-      required: true,
     },
     {
       name: 'isComplete',
       type: 'checkbox',
       defaultValue: false,
-    },
-    {
-      name: 'roleAssignments',
-      type: 'relationship',
-      relationTo: 'project-role-assignments',
-      hasMany: true,
     },
     {
       name: 'phases',

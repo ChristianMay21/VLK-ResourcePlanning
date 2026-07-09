@@ -71,10 +71,13 @@ export interface Config {
     media: Media;
     clients: Client;
     employees: Employee;
+    roles: Role;
+    sectors: Sector;
     projects: Project;
     'project-phases': ProjectPhase;
-    roles: Role;
-    'project-role-assignments': ProjectRoleAssignment;
+    tasks: Task;
+    assignments: Assignment;
+    skills: Skill;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,10 +89,13 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     clients: ClientsSelect<false> | ClientsSelect<true>;
     employees: EmployeesSelect<false> | EmployeesSelect<true>;
+    roles: RolesSelect<false> | RolesSelect<true>;
+    sectors: SectorsSelect<false> | SectorsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     'project-phases': ProjectPhasesSelect<false> | ProjectPhasesSelect<true>;
-    roles: RolesSelect<false> | RolesSelect<true>;
-    'project-role-assignments': ProjectRoleAssignmentsSelect<false> | ProjectRoleAssignmentsSelect<true>;
+    tasks: TasksSelect<false> | TasksSelect<true>;
+    assignments: AssignmentsSelect<false> | AssignmentsSelect<true>;
+    skills: SkillsSelect<false> | SkillsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -197,35 +203,20 @@ export interface Employee {
   photo?: (string | null) | Media;
   jobTitle?: string | null;
   maximumHours: number;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "projects".
- */
-export interface Project {
-  id: string;
-  name: string;
-  client: string | Client;
-  budget: number;
-  isComplete?: boolean | null;
-  roleAssignments?: (string | ProjectRoleAssignment)[] | null;
-  phases?: (string | ProjectPhase)[] | null;
-  startDate: string;
-  endDate: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "project-role-assignments".
- */
-export interface ProjectRoleAssignment {
-  id: string;
-  role: string | Role;
-  employee: string | Employee;
-  allocatedHours: number;
+  manager?: (string | null) | Employee;
+  color?: string | null;
+  skills?:
+    | {
+        skill: string;
+        id?: string | null;
+      }[]
+    | null;
+  sectorExperience?:
+    | {
+        sector: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -241,6 +232,33 @@ export interface Role {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sectors".
+ */
+export interface Sector {
+  id: string;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: string;
+  name: string;
+  client: string | Client;
+  sector?: (string | null) | Sector;
+  budget?: number | null;
+  isComplete?: boolean | null;
+  phases?: (string | ProjectPhase)[] | null;
+  startDate: string;
+  endDate: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "project-phases".
  */
 export interface ProjectPhase {
@@ -248,6 +266,75 @@ export interface ProjectPhase {
   name: string;
   startDate: string;
   endDate: string;
+  requiredSkills?:
+    | {
+        skill: string;
+        id?: string | null;
+      }[]
+    | null;
+  tasks?: (string | Task)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tasks".
+ */
+export interface Task {
+  id: string;
+  name: string;
+  phase: string | ProjectPhase;
+  startDate: string;
+  endDate: string;
+  requiredSkills?:
+    | {
+        skill: string;
+        id?: string | null;
+      }[]
+    | null;
+  completed?: boolean | null;
+  dismissedSuggestions?:
+    | {
+        key: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assignments".
+ */
+export interface Assignment {
+  id: string;
+  workItem:
+    | {
+        relationTo: 'projects';
+        value: string | Project;
+      }
+    | {
+        relationTo: 'project-phases';
+        value: string | ProjectPhase;
+      }
+    | {
+        relationTo: 'tasks';
+        value: string | Task;
+      };
+  employee: string | Employee;
+  role: string | Role;
+  hours: number;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "skills".
+ */
+export interface Skill {
+  id: string;
+  name: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -292,6 +379,14 @@ export interface PayloadLockedDocument {
         value: string | Employee;
       } | null)
     | ({
+        relationTo: 'roles';
+        value: string | Role;
+      } | null)
+    | ({
+        relationTo: 'sectors';
+        value: string | Sector;
+      } | null)
+    | ({
         relationTo: 'projects';
         value: string | Project;
       } | null)
@@ -300,12 +395,16 @@ export interface PayloadLockedDocument {
         value: string | ProjectPhase;
       } | null)
     | ({
-        relationTo: 'roles';
-        value: string | Role;
+        relationTo: 'tasks';
+        value: string | Task;
       } | null)
     | ({
-        relationTo: 'project-role-assignments';
-        value: string | ProjectRoleAssignment;
+        relationTo: 'assignments';
+        value: string | Assignment;
+      } | null)
+    | ({
+        relationTo: 'skills';
+        value: string | Skill;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -407,33 +506,20 @@ export interface EmployeesSelect<T extends boolean = true> {
   photo?: T;
   jobTitle?: T;
   maximumHours?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "projects_select".
- */
-export interface ProjectsSelect<T extends boolean = true> {
-  name?: T;
-  client?: T;
-  budget?: T;
-  isComplete?: T;
-  roleAssignments?: T;
-  phases?: T;
-  startDate?: T;
-  endDate?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "project-phases_select".
- */
-export interface ProjectPhasesSelect<T extends boolean = true> {
-  name?: T;
-  startDate?: T;
-  endDate?: T;
+  manager?: T;
+  color?: T;
+  skills?:
+    | T
+    | {
+        skill?: T;
+        id?: T;
+      };
+  sectorExperience?:
+    | T
+    | {
+        sector?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -448,12 +534,91 @@ export interface RolesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "project-role-assignments_select".
+ * via the `definition` "sectors_select".
  */
-export interface ProjectRoleAssignmentsSelect<T extends boolean = true> {
-  role?: T;
+export interface SectorsSelect<T extends boolean = true> {
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects_select".
+ */
+export interface ProjectsSelect<T extends boolean = true> {
+  name?: T;
+  client?: T;
+  sector?: T;
+  budget?: T;
+  isComplete?: T;
+  phases?: T;
+  startDate?: T;
+  endDate?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-phases_select".
+ */
+export interface ProjectPhasesSelect<T extends boolean = true> {
+  name?: T;
+  startDate?: T;
+  endDate?: T;
+  requiredSkills?:
+    | T
+    | {
+        skill?: T;
+        id?: T;
+      };
+  tasks?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tasks_select".
+ */
+export interface TasksSelect<T extends boolean = true> {
+  name?: T;
+  phase?: T;
+  startDate?: T;
+  endDate?: T;
+  requiredSkills?:
+    | T
+    | {
+        skill?: T;
+        id?: T;
+      };
+  completed?: T;
+  dismissedSuggestions?:
+    | T
+    | {
+        key?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assignments_select".
+ */
+export interface AssignmentsSelect<T extends boolean = true> {
+  workItem?: T;
   employee?: T;
-  allocatedHours?: T;
+  role?: T;
+  hours?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "skills_select".
+ */
+export interface SkillsSelect<T extends boolean = true> {
+  name?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -21,5 +21,22 @@ export const ProjectPhases: CollectionConfig = {
       type: 'date',
       required: true,
     },
+    {
+      name: 'requiredSkills',
+      type: 'array',
+      fields: [
+        {
+          name: 'skill',
+          type: 'text',
+          required: true,
+        },
+      ],
+    },
+    {
+      name: 'tasks',
+      type: 'relationship',
+      relationTo: 'tasks',
+      hasMany: true,
+    },
   ],
 }

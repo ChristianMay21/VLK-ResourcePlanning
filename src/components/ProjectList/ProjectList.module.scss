@@ -1,18 +1,35 @@
 @use '../../app/styles/design-system/index.scss' as *;
 
 .root {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  padding: $size-4;
+  max-width: $page-max-width;
+  margin: 0 auto;
+  padding: 40px $page-padding 80px;
 }
 
-.heading {
-  padding: $size-2 $size-3;
-  color: $gray-6;
-  font-family: $font-sans;
-  font-size: $font-size-0;
-  font-weight: $font-weight-6;
-  letter-spacing: $font-letterspacing-2;
-  text-transform: uppercase;
-  border-bottom: 2px solid $gray-3;
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.title {
+  margin: 0;
+  font-family: $font-newsreader;
+  font-weight: 500;
+  font-size: 22px;
+  color: $ink;
+}
+
+.count {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  color: $ink-soft;
+  letter-spacing: 0.08em;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }

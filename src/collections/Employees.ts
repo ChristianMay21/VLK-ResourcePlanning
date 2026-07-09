@@ -26,5 +26,36 @@ export const Employees: CollectionConfig = {
       required: true,
       defaultValue: 40,
     },
+    {
+      name: 'manager',
+      type: 'relationship',
+      relationTo: 'employees',
+    },
+    {
+      name: 'color',
+      type: 'text',
+    },
+    {
+      name: 'skills',
+      type: 'array',
+      fields: [
+        {
+          name: 'skill',
+          type: 'text',
+          required: true,
+        },
+      ],
+    },
+    {
+      name: 'sectorExperience',
+      type: 'array',
+      fields: [
+        {
+          name: 'sector',
+          type: 'text',
+          required: true,
+        },
+      ],
+    },
   ],
 }

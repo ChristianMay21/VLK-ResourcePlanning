@@ -1,8 +1,0 @@
-@use '../../app/styles/design-system/index.scss' as *;
-
-.root {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: $size-4;
-  padding: $size-4;
-}
