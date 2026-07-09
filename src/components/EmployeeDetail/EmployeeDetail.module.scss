@@ -1,0 +1,256 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.loading {
+  font-family: $font-plex-mono;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: $ink-soft;
+  padding: 20px 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid $ink;
+  margin-bottom: 24px;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name {
+  margin: 0;
+  font-family: $font-newsreader;
+  font-weight: 500;
+  font-size: 24px;
+  color: $ink;
+  line-height: 1.1;
+}
+
+.jobTitle {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+}
+
+.capacity {
+  font-size: 13px;
+  color: $ink-soft;
+}
+
+.section {
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid $line;
+
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+}
+
+.sectionLabel {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: $ink-soft;
+  margin-bottom: 10px;
+}
+
+.managerLink {
+  font-family: $font-newsreader;
+  font-size: 16px;
+  color: $blue;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    color: $blue-light;
+  }
+}
+
+.managerNone {
+  font-size: 13px;
+  color: $ink-soft;
+  font-style: italic;
+}
+
+.scheduleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.windowSelector {
+  display: flex;
+  gap: 2px;
+}
+
+.windowBtn {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: $ink-soft;
+  background: transparent;
+  border: 1px solid $line;
+  padding: 4px 9px;
+  cursor: pointer;
+
+  &[data-active] {
+    color: $blue;
+    border-color: $blue;
+    background: $blue-fill;
+  }
+
+  &:hover:not([data-active]) {
+    border-color: $ink-soft;
+    color: $ink;
+  }
+}
+
+.chart {
+  position: relative;
+  height: 100px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  border-bottom: 1px solid $line;
+  margin-bottom: 8px;
+}
+
+.capacityLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 80%;
+  border-top: 1px dashed $ink-soft;
+  pointer-events: none;
+}
+
+.barCol {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar {
+  width: 100%;
+  border-radius: 2px 2px 0 0;
+  min-height: 1px;
+}
+
+.barLabel {
+  font-family: $font-plex-mono;
+  font-size: 8px;
+  letter-spacing: 0.02em;
+  color: $ink-soft;
+  text-align: center;
+  white-space: nowrap;
+  padding-top: 3px;
+  transform: rotate(-30deg);
+  transform-origin: top center;
+}
+
+.chartLegend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: $font-plex-mono;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: $ink-soft;
+}
+
+.legendDash {
+  color: $ink-soft;
+}
+
+.projectGroup {
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.projectName {
+  display: block;
+  font-family: $font-newsreader;
+  font-weight: 500;
+  font-size: 16px;
+  color: $blue;
+  text-decoration: none;
+  margin-bottom: 6px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.workItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0 5px 12px;
+  border-left: 2px solid $line;
+  margin-bottom: 2px;
+
+  &[data-type='project'] {
+    border-left-color: $blue;
+  }
+
+  &[data-type='task'] {
+    padding-left: 24px;
+  }
+}
+
+.workItemName {
+  font-size: 13px;
+  color: $ink;
+  flex: 1;
+  min-width: 0;
+}
+
+.workItemMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.workItemRole {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: $ink-soft;
+  white-space: nowrap;
+}
+
+.workItemHours {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  color: $blue;
+  white-space: nowrap;
+  min-width: 32px;
+  text-align: right;
+}

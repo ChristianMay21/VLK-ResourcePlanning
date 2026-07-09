@@ -1,0 +1,305 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.loading {
+  font-family: $font-plex-mono;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: $ink-soft;
+  padding: 20px 0;
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.typeBadge {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: $ink-soft;
+  border: 1px solid $line;
+  padding: 3px 8px;
+}
+
+.statusBadge {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.projectLink {
+  display: block;
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: $blue;
+  text-decoration: none;
+  margin-bottom: 6px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.name {
+  margin: 0 0 6px;
+  font-family: $font-newsreader;
+  font-weight: 500;
+  font-size: 24px;
+  color: $ink;
+  line-height: 1.15;
+}
+
+.dateRange {
+  font-size: 13px;
+  color: $ink-soft;
+  margin-bottom: 12px;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.skillTag {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: $blue;
+  border: 1px solid $blue-fill;
+  background: $blue-fill;
+  padding: 3px 7px;
+  white-space: nowrap;
+}
+
+.miniGantt {
+  border-top: 1px solid $line;
+  border-bottom: 1px solid $line;
+  padding: 16px 0;
+  margin-bottom: 24px;
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.sectionLabel {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: $ink-soft;
+  margin-bottom: 10px;
+}
+
+.teamRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid $line;
+
+  &[data-child] {
+    opacity: 0.8;
+    padding-left: 12px;
+    border-left: 2px solid $line;
+  }
+}
+
+.empName {
+  font-family: $font-newsreader;
+  font-size: 14px;
+  color: $paper;
+  background: $gray-neutral;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.memberInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.memberRole {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: $ink-soft;
+}
+
+.memberDesc {
+  font-size: 12px;
+  color: $ink-soft;
+}
+
+.viaLabel {
+  font-family: $font-plex-mono;
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  color: $ink-soft;
+  font-style: italic;
+}
+
+.memberRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.memberHours {
+  font-family: $font-plex-mono;
+  font-size: 12px;
+  color: $blue;
+  white-space: nowrap;
+}
+
+.memberActions {
+  display: flex;
+  gap: 8px;
+}
+
+.actionBtn {
+  font-family: $font-plex-mono;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: $blue;
+  background: transparent;
+  border: 1px solid $blue-fill;
+  padding: 3px 7px;
+  cursor: pointer;
+
+  &[data-destructive] {
+    color: $red;
+    border-color: rgba(181, 67, 47, 0.2);
+  }
+
+  &:hover {
+    border-color: currentColor;
+  }
+}
+
+.suggestion {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid $line;
+}
+
+.suggestionText {
+  font-size: 13px;
+  color: $ink;
+  flex: 1;
+  line-height: 1.4;
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.suggestionActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.suggestionAdd {
+  font-family: $font-plex-mono;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: $green;
+  background: transparent;
+  border: 1px solid $green;
+  padding: 4px 8px;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(74, 124, 89, 0.1);
+  }
+}
+
+.suggestionDismiss {
+  font-family: $font-plex-mono;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+  background: transparent;
+  border: 1px solid $line;
+  padding: 4px 8px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $ink-soft;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 2px solid $ink;
+  margin-top: 8px;
+}
+
+.assignBtn {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $blue;
+  background: $blue-fill;
+  border: 1px solid $blue;
+  padding: 8px 16px;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(44, 74, 110, 0.2);
+  }
+}
+
+.completeBtn {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $green;
+  background: transparent;
+  border: 1px solid $green;
+  padding: 8px 16px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: rgba(74, 124, 89, 0.1);
+  }
+
+  &[data-complete] {
+    color: $ink-soft;
+    border-color: $line;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

@@ -1,0 +1,149 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.phaseBlock {
+  border: 1px solid $line;
+  background: $paper-dark;
+}
+
+.phaseRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  cursor: pointer;
+
+  &:hover {
+    background: #ded3c1;
+  }
+}
+
+.taskRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 18px 11px 40px;
+  border-top: 1px solid $line;
+  cursor: pointer;
+
+  &:hover {
+    background: #ded3c1;
+  }
+}
+
+.rowLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.rowRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.chevron {
+  font-size: 9px;
+  color: $ink-soft;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transform: rotate(0deg);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+
+  &[data-open] {
+    transform: rotate(90deg);
+  }
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 0;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.phaseName {
+  font-size: 15px;
+  font-weight: 500;
+  color: $ink;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.taskName {
+  font-size: 13.5px;
+  color: $ink;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dateRange {
+  font-size: 12.5px;
+  color: $ink-soft;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.skillTag {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: $font-plex-mono;
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  color: $ink-soft;
+  border: 1px solid $line;
+  padding: 2px 6px;
+}
+
+.avatarStack {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.avatar {
+  border-radius: 50%;
+  color: $paper;
+  font-family: $font-plex-mono;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -6px;
+  border: 1.5px solid $paper-dark;
+  flex-shrink: 0;
+
+  .taskRow & {
+    margin-left: -5px;
+  }
+}
+
+.assignLink {
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: $font-plex-mono;
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  color: $blue;
+  background: none;
+  border: none;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

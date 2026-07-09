@@ -1,0 +1,127 @@
+@use '../../../../app/styles/design-system/index.scss' as *;
+
+.root {
+  max-width: $page-max-width;
+  margin: 0 auto;
+  padding: 40px $page-padding 80px;
+}
+
+.backLink {
+  display: inline-block;
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $blue;
+  text-decoration: none;
+  margin-bottom: 10px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0 22px;
+}
+
+.projectName {
+  margin: 0;
+  font-family: $font-newsreader;
+  font-weight: 500;
+  font-size: 26px;
+  color: $ink;
+}
+
+.headerMeta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sectorBadge {
+  font-family: $font-plex-mono;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: $blue;
+  border: 1px solid $blue;
+  padding: 4px 9px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dateRange {
+  font-size: 13px;
+  color: $ink-soft;
+  white-space: nowrap;
+}
+
+.budget {
+  font-family: $font-plex-mono;
+  font-size: 12px;
+  color: $ink-soft;
+  white-space: nowrap;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  margin: 0 0 14px;
+  font-family: $font-newsreader;
+  font-weight: 500;
+  font-size: 19px;
+  color: $ink;
+}
+
+.empty {
+  font-size: 13px;
+  color: $ink-soft;
+  font-style: italic;
+  margin: 0;
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+}
+
+.teamRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid $line;
+  cursor: pointer;
+
+  &:hover {
+    background: $paper-dark;
+  }
+}
+
+.teamInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.teamName {
+  font-size: 14px;
+  font-weight: 500;
+  color: $ink;
+}
+
+.teamRoles {
+  font-size: 12.5px;
+  color: $ink-soft;
+}
+
+.teamHours {
+  font-family: $font-plex-mono;
+  font-size: 12px;
+  color: $blue;
+  white-space: nowrap;
+  flex-shrink: 0;
+}

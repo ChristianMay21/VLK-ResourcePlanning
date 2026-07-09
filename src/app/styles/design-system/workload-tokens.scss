@@ -1,0 +1,34 @@
+// Workload Planner design tokens — spec-exact palette and typography
+// Colors
+$paper: #f1ece1;
+$paper-dark: #e7ded0;
+$ink: #211f1a;
+$ink-soft: #6b6558;
+$blue: #2c4a6e;
+$blue-fill: rgba(44, 74, 110, 0.12);
+$blue-light: #5a7fa3;
+$red: #b5432f;
+$red-fill: rgba(181, 67, 47, 0.12);
+$amber: #b8862e;
+$amber-fill: rgba(184, 134, 46, 0.14);
+$green: #4a7c59;
+$gray-neutral: #9a9484;
+$line: rgba(33, 31, 26, 0.16);
+
+// Avatar swatch palette (Admin color picker options)
+$avatar-swatches: #2c4a6e, #b8862e, #4a7c59, #5a7fa3, #9a6a4a, #7a5c8a, #b5432f, #6b6558;
+
+// Typography (CSS variables set by next/font in layout.tsx)
+$font-newsreader: var(--font-newsreader), serif;
+$font-plex-sans: var(--font-plex-sans), sans-serif;
+$font-plex-mono: var(--font-plex-mono), monospace;
+
+// Status color mapping
+$status-upcoming: #9a9484;
+$status-active: #2c4a6e;
+$status-complete: #4a7c59;
+
+// Layout
+$page-max-width: 1240px;
+$page-padding: 32px;
+$drawer-width: 620px;

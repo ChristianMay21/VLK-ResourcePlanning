@@ -1,0 +1,64 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  max-width: $page-max-width;
+  margin: 0 auto;
+  padding: 40px $page-padding 80px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.title {
+  margin: 0;
+  font-family: $font-newsreader;
+  font-weight: 500;
+  font-size: 26px;
+  color: $ink;
+}
+
+.windowSelector {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.windowLabel {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: $ink-soft;
+  margin-right: 10px;
+}
+
+.windowBtn {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: $ink-soft;
+  background: transparent;
+  border: 1px solid $line;
+  padding: 5px 12px;
+  cursor: pointer;
+
+  &[data-active] {
+    color: $blue;
+    border-color: $blue;
+    background: $blue-fill;
+  }
+
+  &:hover:not([data-active]) {
+    border-color: $ink-soft;
+    color: $ink;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}

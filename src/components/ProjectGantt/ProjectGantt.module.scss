@@ -1,0 +1,85 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  border: 1px solid $line;
+  background: $paper-dark;
+  padding: 18px 20px 22px;
+  margin-bottom: 28px;
+}
+
+.label {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: $ink-soft;
+  margin-bottom: 14px;
+}
+
+.ruler {
+  position: relative;
+  height: 20px;
+  margin-bottom: 6px;
+}
+
+.monthLabel {
+  position: absolute;
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  color: $ink-soft;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.rowLabel {
+  flex-shrink: 0;
+  padding-right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: $font-plex-sans;
+}
+
+.timeline {
+  flex: 1;
+  position: relative;
+  height: 100%;
+}
+
+.bar {
+  position: absolute;
+}
+
+.legend {
+  display: flex;
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: $font-plex-mono;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: $ink-soft;
+  white-space: nowrap;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  display: inline-block;
+}

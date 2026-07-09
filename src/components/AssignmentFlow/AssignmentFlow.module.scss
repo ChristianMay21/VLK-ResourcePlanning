@@ -1,0 +1,249 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.loading {
+  font-family: $font-plex-mono;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: $ink-soft;
+  padding: 20px 0;
+}
+
+.flowHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid $ink;
+  margin-bottom: 20px;
+}
+
+.backBtn {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: $blue;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.flowTitle {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: $ink;
+}
+
+.selectedEmp {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid $line;
+  margin-bottom: 20px;
+}
+
+.empDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.empName {
+  font-family: $font-newsreader;
+  font-size: 16px;
+  font-weight: 500;
+  color: $ink;
+}
+
+.empTitle {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: $ink-soft;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.fieldLabel {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: $ink-soft;
+}
+
+.input {
+  font-family: $font-plex-sans;
+  font-size: 14px;
+  color: $ink;
+  background: $paper;
+  border: 1px solid $line;
+  padding: 8px 10px;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: $blue;
+  }
+}
+
+.warning {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: $amber;
+  border: 1px solid $amber;
+  background: rgba(184, 134, 46, 0.08);
+  padding: 10px 12px;
+  margin-bottom: 16px;
+}
+
+.formActions {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid $line;
+}
+
+.confirmBtn {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $paper;
+  background: $blue;
+  border: none;
+  padding: 10px 18px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: #1e3a58;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.cancelBtn {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+  background: transparent;
+  border: 1px solid $line;
+  padding: 10px 16px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $ink-soft;
+    color: $ink;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  font-family: $font-plex-mono;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: $ink-soft;
+  text-align: left;
+  padding: 8px 10px 8px 0;
+  border-bottom: 1px solid $ink;
+  white-space: nowrap;
+
+  &[data-sortable] {
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      color: $ink;
+    }
+  }
+}
+
+.candidateRow {
+  cursor: pointer;
+
+  &:hover .td {
+    background: $paper-dark;
+  }
+}
+
+.td {
+  padding: 10px 10px 10px 0;
+  border-bottom: 1px solid $line;
+  vertical-align: middle;
+}
+
+.candEmpCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.candName {
+  font-size: 13px;
+  font-weight: 500;
+  color: $ink;
+  white-space: nowrap;
+}
+
+.candTitle {
+  font-family: $font-plex-mono;
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  color: $ink-soft;
+  white-space: nowrap;
+}
+
+.availPct {
+  font-family: $font-plex-mono;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.matchYes {
+  font-family: $font-plex-mono;
+  font-size: 10.5px;
+  color: $green;
+  white-space: nowrap;
+}
+
+.matchNo {
+  font-family: $font-plex-mono;
+  font-size: 10.5px;
+  color: $ink-soft;
+  white-space: nowrap;
+}
+
+.skillCount {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  color: $ink;
+  white-space: nowrap;
+}

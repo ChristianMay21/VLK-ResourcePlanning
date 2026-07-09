@@ -1,0 +1,204 @@
+@use '../../../app/styles/design-system/index.scss' as *;
+
+.root {
+  max-width: $page-max-width;
+  margin: 0 auto;
+  padding: 40px $page-padding 80px;
+}
+
+.pageTitle {
+  margin: 0 0 32px;
+  font-family: $font-newsreader;
+  font-weight: 500;
+  font-size: 26px;
+  color: $ink;
+}
+
+.section {
+  margin-bottom: 48px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid $line;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  margin: 0 0 16px;
+  font-family: $font-newsreader;
+  font-weight: 500;
+  font-size: 19px;
+  color: $ink;
+
+  .sectionHeader & {
+    margin-bottom: 0;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid $line;
+}
+
+.listRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid $line;
+}
+
+.empDot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.empInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.empName {
+  font-size: 14px;
+  font-weight: 500;
+  color: $ink;
+}
+
+.empMeta {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: $ink-soft;
+}
+
+.empCapacity {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  color: $ink-soft;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.itemName {
+  flex: 1;
+  font-size: 14px;
+  color: $ink;
+}
+
+.inlineInput {
+  flex: 1;
+  font-family: $font-plex-sans;
+  font-size: 14px;
+  color: $ink;
+  background: $paper;
+  border: 1px solid $blue;
+  padding: 6px 8px;
+
+  &::placeholder {
+    color: $ink-soft;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $blue;
+  }
+}
+
+.addRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.addBtn {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: $blue;
+  background: $blue-fill;
+  border: 1px solid $blue;
+  padding: 7px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: rgba(44, 74, 110, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.editBtn {
+  font-family: $font-plex-mono;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: $blue;
+  background: transparent;
+  border: 1px solid $blue-fill;
+  padding: 4px 9px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: $blue;
+  }
+}
+
+.saveBtn {
+  font-family: $font-plex-mono;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: $paper;
+  background: $blue;
+  border: none;
+  padding: 5px 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cancelBtn {
+  font-family: $font-plex-mono;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+  background: transparent;
+  border: 1px solid $line;
+  padding: 5px 9px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.deleteBtn {
+  font-family: $font-plex-mono;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: $red;
+  background: transparent;
+  border: 1px solid rgba(181, 67, 47, 0.25);
+  padding: 4px 9px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: $red;
+    background: rgba(181, 67, 47, 0.06);
+  }
+}

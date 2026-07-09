@@ -1,0 +1,106 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  display: block;
+  border: 1px solid $line;
+  background: $paper-dark;
+  padding: 22px 24px;
+  text-decoration: none;
+  color: $ink;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $blue;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.name {
+  font-family: $font-newsreader;
+  font-weight: 500;
+  font-size: 20px;
+  color: $ink;
+}
+
+.sector {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-family: $font-plex-mono;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: $blue;
+  border: 1px solid $blue;
+  padding: 3px 8px;
+}
+
+.meta {
+  display: flex;
+  gap: 22px;
+  margin-bottom: 14px;
+}
+
+.metaItem {
+  font-size: 13px;
+  color: $ink-soft;
+  white-space: nowrap;
+}
+
+.hoursSection {
+  border-top: 1px solid $line;
+  padding-top: 12px;
+}
+
+.hoursHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.hoursLabel {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+}
+
+.hoursTotal {
+  font-family: $font-plex-mono;
+  font-size: 13px;
+  font-weight: 600;
+  color: $blue;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: $paper;
+  border: 1px solid $line;
+  padding: 4px 9px 4px 5px;
+}
+
+.chipName {
+  font-size: 12.5px;
+  white-space: nowrap;
+  color: $ink;
+}
+
+.chipHours {
+  font-family: $font-plex-mono;
+  font-size: 11.5px;
+  color: $ink-soft;
+  white-space: nowrap;
+}
