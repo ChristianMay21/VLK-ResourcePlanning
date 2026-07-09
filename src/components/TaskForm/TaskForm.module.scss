@@ -1,0 +1,108 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-family: $font-plex-mono;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: $ink;
+  border-bottom: 2px solid $ink;
+  padding-bottom: 14px;
+}
+
+.context {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: $ink-soft;
+  margin-bottom: 20px;
+  padding-top: 10px;
+
+  strong {
+    color: $ink;
+    font-weight: 600;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.label {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: $ink-soft;
+}
+
+.input {
+  font-family: $font-plex-sans;
+  font-size: 14px;
+  color: $ink;
+  background: $paper;
+  border: 1px solid $line;
+  padding: 8px 10px;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: $blue;
+  }
+}
+
+.error {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  color: $red;
+  margin-bottom: 16px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.saveBtn {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $blue;
+  background: $blue-fill;
+  border: 1px solid $blue;
+  padding: 9px 18px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: rgba(44, 74, 110, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.cancelBtn {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+  background: transparent;
+  border: 1px solid $line;
+  padding: 9px 18px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $ink-soft;
+  }
+}
