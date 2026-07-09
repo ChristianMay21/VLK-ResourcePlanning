@@ -1,0 +1,18 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: $blue;
+  background: $blue-fill;
+  border: 1px solid $blue;
+  padding: 7px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(44, 74, 110, 0.2);
+  }
+}

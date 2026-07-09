@@ -1,0 +1,109 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.title {
+  margin: 0 0 24px;
+  font-family: $font-plex-mono;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: $ink;
+  border-bottom: 2px solid $ink;
+  padding-bottom: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.label {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: $ink-soft;
+}
+
+.input {
+  font-family: $font-plex-sans;
+  font-size: 14px;
+  color: $ink;
+  background: $paper;
+  border: 1px solid $line;
+  padding: 8px 10px;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: $blue;
+  }
+}
+
+.emptyNote {
+  font-size: 13px;
+  color: $ink-soft;
+  font-style: italic;
+}
+
+.error {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  color: $red;
+  margin-bottom: 16px;
+}
+
+.formActions {
+  display: flex;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid $line;
+  margin-top: 4px;
+}
+
+.saveBtn {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $paper;
+  background: $blue;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: #1e3a58;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.cancelBtn {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+  background: transparent;
+  border: 1px solid $line;
+  padding: 10px 16px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $ink-soft;
+    color: $ink;
+  }
+}
