@@ -33,18 +33,14 @@ type PhaseData = {
   status: 'upcoming' | 'active' | 'complete'
   requiredSkills: string[]
   avatars: AvatarData[]
+  budgetAllocation: number | null
+  projectBudget: number | null
   tasks: TaskData[]
 }
 
 type PhaseListProps = {
   phases: PhaseData[]
   projectId: string
-}
-
-const STATUS_COLORS = {
-  upcoming: '#9a9484',
-  active: '#2c4a6e',
-  complete: '#4a7c59',
 }
 
 const SKILL_CAP = 2
@@ -123,77 +119,80 @@ export default function PhaseList(props: PhaseListProps) {
 
   return (
     <div className={styles.root}>
-      {props.phases.map(phase => (
-        <div key={phase.id} className={styles.phaseBlock}>
-          <div className={styles.phaseRow} onClick={() => openPhase(phase.id)}>
-            <div className={styles.rowLeft}>
-              <button
-                type="button"
-                className={styles.chevron}
-                data-open={expanded[phase.id] ? 'true' : undefined}
-                onClick={e => { e.stopPropagation(); setExpanded(prev => ({ ...prev, [phase.id]: !prev[phase.id] })) }}
-                aria-label={expanded[phase.id] ? 'Collapse' : 'Expand'}
-              >
-                ▶
-              </button>
-              <span
-                className={styles.statusDot}
-                style={{ background: STATUS_COLORS[phase.status] }}
-              />
-              <span className={styles.phaseName}>{phase.name}</span>
-              <span className={styles.dateRange}>{formatDateRange(phase.startDate, phase.endDate)}</span>
-            </div>
-            <div className={styles.rowRight}>
-              <SkillTags skills={phase.requiredSkills} />
-              <AvatarStack avatars={phase.avatars} size={24} />
-              <button
-                className={styles.assignLink}
-                onClick={e => e.stopPropagation()}
-                type="button"
-              >
-                + ASSIGN
-              </button>
-            </div>
-          </div>
-          {expanded[phase.id] && (
-            <>
-              {phase.tasks.map(task => (
-                <div key={task.id} className={styles.taskRow} onClick={() => openTask(task.id)}>
-                  <div className={styles.rowLeft}>
-                    <span
-                      className={styles.statusDot}
-                      style={{ background: STATUS_COLORS[task.status], width: 6, height: 6 }}
-                    />
-                    <span className={styles.taskName}>{task.name}</span>
-                    <span className={styles.dateRange}>{formatDateRange(task.startDate, task.endDate)}</span>
-                  </div>
-                  <div className={styles.rowRight}>
-                    <SkillTags skills={task.requiredSkills} />
-                    <AvatarStack avatars={task.avatars} size={20} />
-                    <button
-                      className={styles.assignLink}
-                      onClick={e => e.stopPropagation()}
-                      type="button"
-                      style={{ fontSize: 10 }}
-                    >
-                      + ASSIGN
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <div className={styles.addTaskRow}>
+      {props.phases.map(phase => {
+        const budgetPct = phase.budgetAllocation != null && phase.projectBudget != null && phase.projectBudget > 0
+          ? Math.round((phase.budgetAllocation / phase.projectBudget) * 100)
+          : null
+
+        return (
+          <div key={phase.id} className={styles.phaseBlock}>
+            <div className={styles.phaseRow} onClick={() => openPhase(phase.id)}>
+              <div className={styles.rowLeft}>
                 <button
                   type="button"
-                  className={styles.addTaskBtn}
-                  onClick={e => { e.stopPropagation(); openAddTask(phase) }}
+                  className={styles.chevron}
+                  data-open={expanded[phase.id] ? 'true' : undefined}
+                  onClick={e => { e.stopPropagation(); setExpanded(prev => ({ ...prev, [phase.id]: !prev[phase.id] })) }}
+                  aria-label={expanded[phase.id] ? 'Collapse' : 'Expand'}
                 >
-                  + ADD TASK
+                  ▶
+                </button>
+                <span className={styles.statusDot} data-status={phase.status} />
+                <span className={styles.phaseName}>{phase.name}</span>
+                <span className={styles.dateRange}>{formatDateRange(phase.startDate, phase.endDate)}</span>
+                {budgetPct != null && (
+                  <span className={styles.budgetBadge}>{budgetPct}% of budget</span>
+                )}
+              </div>
+              <div className={styles.rowRight}>
+                <SkillTags skills={phase.requiredSkills} />
+                <AvatarStack avatars={phase.avatars} size={24} />
+                <button
+                  className={styles.assignLink}
+                  onClick={e => e.stopPropagation()}
+                  type="button"
+                >
+                  + ASSIGN
                 </button>
               </div>
-            </>
-          )}
-        </div>
-      ))}
+            </div>
+            {expanded[phase.id] && (
+              <>
+                {phase.tasks.map(task => (
+                  <div key={task.id} className={styles.taskRow} onClick={() => openTask(task.id)}>
+                    <div className={styles.rowLeft}>
+                      <span className={styles.statusDot} data-status={task.status} data-size="sm" />
+                      <span className={styles.taskName}>{task.name}</span>
+                      <span className={styles.dateRange}>{formatDateRange(task.startDate, task.endDate)}</span>
+                    </div>
+                    <div className={styles.rowRight}>
+                      <SkillTags skills={task.requiredSkills} />
+                      <AvatarStack avatars={task.avatars} size={20} />
+                      <button
+                        className={styles.assignLink}
+                        onClick={e => e.stopPropagation()}
+                        type="button"
+                        style={{ fontSize: 10 }}
+                      >
+                        + ASSIGN
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <div className={styles.addTaskRow}>
+                  <button
+                    type="button"
+                    className={styles.addTaskBtn}
+                    onClick={e => { e.stopPropagation(); openAddTask(phase) }}
+                  >
+                    + ADD TASK
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )
+      })}
       <div className={styles.addPhaseRow}>
         <button type="button" className={styles.addPhaseBtn} onClick={openAddPhase}>
           + ADD PHASE

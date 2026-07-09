@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { rollingUtilizationPct, utilizationColor, weeklySchedule, type AssignmentForUtil } from '@/lib/utilization'
 import { parseDate, daysBetween } from '@/lib/dateUtils'
+import UtilizationRing from '@/components/UtilizationRing/UtilizationRing'
 import styles from './AssignmentFlow.module.scss'
 
 type Candidate = {
@@ -20,6 +21,15 @@ type Candidate = {
 }
 
 type Role = { id: string; name: string }
+
+type BudgetData = {
+  projectBudget: number | null
+  projectName: string
+  projectExistingCost: number
+  workItemBudget: number | null
+  workItemExistingCost: number
+  workItemName: string
+}
 
 type EditingAssignment = {
   assignmentId: string
@@ -48,6 +58,10 @@ type AssignmentFlowProps = {
 
 type SortKey = 'availability' | 'sectorMatch' | 'skillsMatch'
 type SortDir = 'asc' | 'desc'
+
+function fmtMoney(n: number): string {
+  return '$' + Math.round(n).toLocaleString('en-US')
+}
 
 function assignmentWeeklyRate(hours: number, startDate: string, endDate: string): number {
   const start = parseDate(startDate)
@@ -86,6 +100,7 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
   const [candidates, setCandidates] = useState<Candidate[]>([])
   const [roles, setRoles] = useState<Role[]>([])
   const [empProjectRates, setEmpProjectRates] = useState<Record<string, number>>({})
+  const [budgetData, setBudgetData] = useState<BudgetData | null>(null)
   const [loading, setLoading] = useState(true)
   const [sortKey, setSortKey] = useState<SortKey>('availability')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
@@ -118,6 +133,7 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
         setCandidates(candidateList)
         setRoles(roleList)
         setEmpProjectRates(rateMap)
+        setBudgetData(d.budgetData ?? null)
 
         if (props.editingAssignment) {
           const ea = props.editingAssignment
@@ -232,16 +248,18 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
         </div>
 
         <div className={styles.selectedEmp}>
-          <span
-            className={styles.empDot}
-            style={{ background: selected.color ?? '#9a9484' }}
+          <UtilizationRing
+            size="xs"
+            pct={selected.availabilityPct}
+            name={selected.name}
+            avatarColor={selected.color ?? '#9a9484'}
           />
           <span className={styles.empName}>{selected.name}</span>
           {selected.jobTitle && <span className={styles.empTitle}>{selected.jobTitle}</span>}
         </div>
 
         <div className={styles.field}>
-          <label className={styles.fieldLabel} htmlFor="flow-hours">BILLABLE HOURS</label>
+          <label className={styles.fieldLabel} htmlFor="flow-hours">{props.isInternal ? 'COMMITTED HOURS' : 'BILLABLE HOURS'}</label>
           <input
             id="flow-hours"
             type="number"
@@ -295,6 +313,67 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
           />
         </div>
 
+        {!props.isInternal && budgetData && (() => {
+          const numRate = parseFloat(rate)
+          const thisCost = !isNaN(numHours) && numHours > 0 && !isNaN(numRate) && numRate > 0
+            ? numHours * numRate
+            : null
+          const showPanel = thisCost != null || budgetData.projectBudget != null
+
+          if (!showPanel) return null
+
+          const newProjectCost = budgetData.projectExistingCost + (thisCost ?? 0)
+          const projectRemaining = budgetData.projectBudget != null
+            ? budgetData.projectBudget - newProjectCost
+            : null
+          const projectPct = budgetData.projectBudget != null && budgetData.projectBudget > 0
+            ? (newProjectCost / budgetData.projectBudget) * 100
+            : null
+
+          const newWorkItemCost = budgetData.workItemExistingCost + (thisCost ?? 0)
+          const workItemRemaining = budgetData.workItemBudget != null
+            ? budgetData.workItemBudget - newWorkItemCost
+            : null
+          const workItemPct = budgetData.workItemBudget != null && budgetData.workItemBudget > 0
+            ? (newWorkItemCost / budgetData.workItemBudget) * 100
+            : null
+
+          return (
+            <div className={styles.budgetImpact}>
+              <div className={styles.budgetImpactLabel}>BUDGET IMPACT</div>
+              {thisCost != null && (
+                <div className={styles.budgetImpactLine}>
+                  This assignment: <strong>{fmtMoney(thisCost)}</strong>
+                </div>
+              )}
+              {budgetData.workItemBudget != null && (
+                <div
+                  className={styles.budgetImpactLine}
+                  data-over={workItemRemaining != null && workItemRemaining < 0 ? 'true' : undefined}
+                >
+                  {budgetData.workItemName}: {fmtMoney(newWorkItemCost)} of {fmtMoney(budgetData.workItemBudget)} allocated
+                  {workItemPct != null && <> ({Math.round(workItemPct)}%)</>}
+                  {workItemRemaining != null && (
+                    <> — {workItemRemaining >= 0 ? fmtMoney(workItemRemaining) + ' remaining' : fmtMoney(Math.abs(workItemRemaining)) + ' over'}</>
+                  )}
+                </div>
+              )}
+              {budgetData.projectBudget != null && (
+                <div
+                  className={styles.budgetImpactLine}
+                  data-over={projectRemaining != null && projectRemaining < 0 ? 'true' : undefined}
+                >
+                  {budgetData.projectName}: {fmtMoney(newProjectCost)} of {fmtMoney(budgetData.projectBudget)} budget
+                  {projectPct != null && <> ({Math.round(projectPct)}%)</>}
+                  {projectRemaining != null && (
+                    <> — {projectRemaining >= 0 ? fmtMoney(projectRemaining) + ' remaining' : fmtMoney(Math.abs(projectRemaining)) + ' over'}</>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })()}
+
         {capWarning && (
           <div className={styles.warning}>⚠ {capWarning}</div>
         )}
@@ -345,7 +424,12 @@ export default function AssignmentFlow(props: AssignmentFlowProps) {
               <tr key={emp.id} className={styles.candidateRow} onClick={() => handleSelectEmployee(emp)}>
                 <td className={styles.td}>
                   <div className={styles.candEmpCell}>
-                    <span className={styles.empDot} style={{ background: emp.color ?? '#9a9484' }} />
+                    <UtilizationRing
+                      size="xs"
+                      pct={emp.availabilityPct}
+                      name={emp.name}
+                      avatarColor={emp.color ?? '#9a9484'}
+                    />
                     <span className={styles.candName}>{emp.name}</span>
                     {emp.jobTitle && <span className={styles.candTitle}>{emp.jobTitle}</span>}
                   </div>

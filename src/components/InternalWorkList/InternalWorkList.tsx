@@ -36,7 +36,7 @@ export default function InternalWorkList(props: InternalWorkListProps) {
   const router = useRouter()
 
   function openTask(taskId: string) {
-    setDrawer({ component: WorkItemDetail, componentProps: { workItemId: taskId, workItemType: 'task' } })
+    setDrawer({ component: WorkItemDetail, componentProps: { workItemId: taskId, workItemType: 'task', onAssignmentChange: () => router.refresh() } })
   }
 
   function openAddTask(cat: CategoryGroup) {

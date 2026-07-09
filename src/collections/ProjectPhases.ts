@@ -33,6 +33,10 @@ export const ProjectPhases: CollectionConfig = {
       ],
     },
     {
+      name: 'budgetAllocation',
+      type: 'number',
+    },
+    {
       name: 'tasks',
       type: 'relationship',
       relationTo: 'tasks',

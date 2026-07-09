@@ -12,6 +12,7 @@ import styles from './WorkItemDetail.module.scss'
 type WorkItemDetailProps = {
   workItemId: string
   workItemType: 'phase' | 'task'
+  onAssignmentChange?: () => void
 }
 
 type GanttBar = {
@@ -110,6 +111,7 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
   async function removeAssignment(assignmentId: string) {
     await fetch(`/api/assignments/${assignmentId}`, { method: 'DELETE' })
     load()
+    props.onAssignmentChange?.()
   }
 
   async function toggleComplete() {
@@ -170,7 +172,7 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
           rate: editing.rate != null ? String(editing.rate) : '',
         } : undefined}
         onClose={() => setFlowMode(null)}
-        onSave={() => { setFlowMode(null); load() }}
+        onSave={() => { setFlowMode(null); load(); props.onAssignmentChange?.() }}
       />
     )
   }
@@ -241,7 +243,10 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
                 {member.description && <span className={styles.memberDesc}>{member.description}</span>}
               </div>
               <div className={styles.memberRight}>
-                <span className={styles.memberHours}>{member.hours}h</span>
+                <span className={styles.memberHours}>
+                  {member.hours}h
+                  {member.rate != null && <> · ${Math.round(member.hours * member.rate).toLocaleString('en-US')}</>}
+                </span>
                 <div className={styles.memberActions}>
                   <button
                     type="button"

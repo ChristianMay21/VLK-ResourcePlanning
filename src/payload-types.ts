@@ -276,6 +276,7 @@ export interface ProjectPhase {
         id?: string | null;
       }[]
     | null;
+  budgetAllocation?: number | null;
   tasks?: (string | Task)[] | null;
   updatedAt: string;
   createdAt: string;
@@ -593,6 +594,7 @@ export interface ProjectPhasesSelect<T extends boolean = true> {
         skill?: T;
         id?: T;
       };
+  budgetAllocation?: T;
   tasks?: T;
   updatedAt?: T;
   createdAt?: T;

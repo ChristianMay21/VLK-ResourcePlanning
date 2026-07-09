@@ -5,6 +5,7 @@ import config from '@/payload.config'
 import type { Assignment, Employee, Project, ProjectPhase, Role, Sector, Task } from '@/payload-types'
 import ProjectGantt from '@/components/ProjectGantt/ProjectGantt'
 import PhaseList from '@/components/PhaseList/PhaseList'
+import ProjectBudget from '@/components/ProjectBudget/ProjectBudget'
 import UtilizationRing from '@/components/UtilizationRing/UtilizationRing'
 import DeleteProjectButton from '@/components/DeleteProjectButton/DeleteProjectButton'
 import { formatDateRange, deriveStatus } from '@/lib/dateUtils'
@@ -15,6 +16,10 @@ type Params = { id: string }
 
 function resolveId(val: string | { id: string }): string {
   return typeof val === 'string' ? val : val.id
+}
+
+function assignmentCost(a: Assignment): number {
+  return a.rate != null ? a.hours * a.rate : 0
 }
 
 export default async function ProjectDetailPage(props: { params: Promise<Params> }) {
@@ -100,7 +105,23 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
     assignmentsByWorkItem[wid].push(a)
   }
 
-  // Build gantt bars: phases first, then tasks nested under each phase
+  // Compute cost per phase (direct phase assignments + task assignments within that phase)
+  const sortedPhases = phaseIds
+    .map(pid => phases.find(p => p.id === pid))
+    .filter((p): p is ProjectPhase => Boolean(p))
+
+  const phaseCosts: Record<string, number> = {}
+  for (const phase of sortedPhases) {
+    const phaseTaskIds = (phase.tasks ?? []).map(t => resolveId(t as string | Task))
+    const direct = (assignmentsByWorkItem[phase.id] ?? []).reduce((sum, a) => sum + assignmentCost(a), 0)
+    const fromTasks = phaseTaskIds.reduce((sum, tid) =>
+      sum + (assignmentsByWorkItem[tid] ?? []).reduce((s, a) => s + assignmentCost(a), 0), 0)
+    phaseCosts[phase.id] = direct + fromTasks
+  }
+
+  const totalCost = allProjectAssignments.reduce((sum, a) => sum + assignmentCost(a), 0)
+
+  // Build gantt bars
   type GanttBar = {
     id: string
     label: string
@@ -111,10 +132,6 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
   }
 
   const ganttBars: GanttBar[] = []
-  const sortedPhases = phaseIds
-    .map(pid => phases.find(p => p.id === pid))
-    .filter((p): p is ProjectPhase => Boolean(p))
-
   for (const phase of sortedPhases) {
     ganttBars.push({
       id: phase.id,
@@ -147,6 +164,8 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
       .map(e => ({ id: e.id, name: e.name, color: e.color ?? null }))
   }
 
+  const projectBudget = project.budget ?? null
+
   const phaseListData = sortedPhases.map(phase => {
     const phaseTasks = (phase.tasks ?? [])
       .map(t => t as string | Task)
@@ -160,6 +179,8 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
       status: deriveStatus(phase.startDate, phase.endDate) as 'upcoming' | 'active' | 'complete',
       requiredSkills: (phase.requiredSkills ?? []).map(s => s.skill),
       avatars: avatarsForItem(phase.id),
+      budgetAllocation: phase.budgetAllocation ?? null,
+      projectBudget,
       tasks: phaseTasks.map(task => ({
         id: task.id,
         name: task.name,
@@ -172,6 +193,14 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
     }
   })
 
+  // ProjectBudget data
+  const phaseBudgetData = sortedPhases.map(phase => ({
+    id: phase.id,
+    name: phase.name,
+    budgetAllocation: phase.budgetAllocation ?? null,
+    cost: phaseCosts[phase.id] ?? 0,
+  }))
+
   // Build "Team on This Project" — unique employees across all assignments
   type TeamEntry = {
     id: string
@@ -179,6 +208,7 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
     color: string | null
     roles: string[]
     totalHours: number
+    totalCost: number
     capacity: number
   }
   const teamMap: Record<string, TeamEntry> = {}
@@ -194,10 +224,12 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
         color: emp.color ?? null,
         roles: [],
         totalHours: 0,
+        totalCost: 0,
         capacity: emp.maximumHours ?? 40,
       }
     }
     teamMap[emp.id].totalHours += assignment.hours
+    teamMap[emp.id].totalCost += assignmentCost(assignment)
     if (roleName && !teamMap[emp.id].roles.includes(roleName)) {
       teamMap[emp.id].roles.push(roleName)
     }
@@ -216,7 +248,6 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
       })
     : { docs: [] as Assignment[] }
 
-  // Build per-employee AssignmentForUtil from their global assignments
   const empAllAssignments: Record<string, AssignmentForUtil[]> = {}
   for (const assignment of allTeamAssignments) {
     const emp = assignment.employee
@@ -244,11 +275,15 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
           <DeleteProjectButton projectId={id} projectName={project.name} />
           {sectorName && <span className={styles.sectorBadge}>{sectorName}</span>}
           <span className={styles.dateRange}>{formatDateRange(project.startDate, project.endDate)}</span>
-          {project.budget != null && (
-            <span className={styles.budget}>${project.budget.toLocaleString('en-US')}</span>
-          )}
         </div>
       </div>
+
+      <ProjectBudget
+        projectId={id}
+        budget={projectBudget}
+        phases={phaseBudgetData}
+        totalCost={totalCost}
+      />
 
       {ganttBars.length > 0 && (
         <ProjectGantt
@@ -280,7 +315,10 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
                   <div className={styles.teamName}>{member.name}</div>
                   <div className={styles.teamRoles}>{member.roles.join(', ')}</div>
                 </div>
-                <span className={styles.teamHours}>{member.totalHours} hrs</span>
+                <span className={styles.teamHours}>
+                  {member.totalHours} hrs
+                  {member.totalCost > 0 && <> · {fmtMoney(member.totalCost)}</>}
+                </span>
               </div>
             ))}
           </div>
@@ -290,4 +328,8 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
       </section>
     </div>
   )
+}
+
+function fmtMoney(n: number): string {
+  return '$' + Math.round(n).toLocaleString('en-US')
 }

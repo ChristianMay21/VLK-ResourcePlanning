@@ -5,6 +5,30 @@ import type { Project, ProjectPhase, Task } from '@/payload-types'
 
 type Params = { id: string }
 
+export async function PATCH(req: NextRequest, context: { params: Promise<Params> }) {
+  const { id } = await context.params
+  const body = await req.json()
+  const payload = await getPayload({ config: await config })
+
+  const project = await payload.findByID({
+    collection: 'projects',
+    id,
+    depth: 0,
+    overrideAccess: true,
+  }).catch(() => null)
+
+  if (!project) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  const updated = await payload.update({
+    collection: 'projects',
+    id,
+    data: { budget: body.budget != null ? Number(body.budget) : undefined },
+    overrideAccess: true,
+  })
+
+  return NextResponse.json({ id: updated.id, budget: updated.budget ?? null })
+}
+
 export async function DELETE(_req: NextRequest, context: { params: Promise<Params> }) {
   const { id } = await context.params
   const payload = await getPayload({ config: await config })

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
-import type { Employee, Project, ProjectPhase, Role, Sector, Task } from '@/payload-types'
+import type { Assignment, Employee, Project, ProjectPhase, Role, Sector, Task } from '@/payload-types'
 import { rollingUtilizationPct } from '@/lib/utilization'
 
 export async function GET(req: NextRequest) {
@@ -66,7 +66,11 @@ export async function GET(req: NextRequest) {
   const empAssignments: Record<string, { hours: number; startDate: string; endDate: string }[]> = {}
   const empProjectRates: Record<string, number> = {}
 
-  for (const assignment of allAssignments) {
+  // Budget cost tracking — cost = hours × rate for each assignment
+  let projectExistingCost = 0
+  let workItemExistingCost = 0
+
+  for (const assignment of allAssignments as Assignment[]) {
     const emp = assignment.employee
     if (typeof emp !== 'object') continue
     const wv = assignment.workItem.value
@@ -79,8 +83,13 @@ export async function GET(req: NextRequest) {
       empAssignments[emp.id].push({ hours: assignment.hours, startDate: wItem.startDate, endDate: wItem.endDate })
     }
 
-    if (!isInternal && wItem.id && projectWorkItemIds.has(wItem.id) && assignment.rate != null && empProjectRates[emp.id] == null) {
-      empProjectRates[emp.id] = assignment.rate
+    if (!isInternal && wItem.id && projectWorkItemIds.has(wItem.id)) {
+      if (assignment.rate != null && empProjectRates[emp.id] == null) {
+        empProjectRates[emp.id] = assignment.rate
+      }
+      const cost = assignment.rate != null ? assignment.hours * assignment.rate : 0
+      projectExistingCost += cost
+      if (wItem.id === workItemId) workItemExistingCost += cost
     }
   }
 
@@ -119,6 +128,44 @@ export async function GET(req: NextRequest) {
     })
     .map((r: Role) => ({ id: r.id, name: r.name }))
 
+  // Budget data for the impact panel (project assignments only)
+  let budgetData: {
+    projectBudget: number | null
+    projectName: string
+    projectExistingCost: number
+    workItemBudget: number | null
+    workItemExistingCost: number
+    workItemName: string
+  } | null = null
+
+  if (!isInternal && projectId) {
+    const proj = await payload.findByID({
+      collection: 'projects', id: projectId, depth: 0, overrideAccess: true,
+    }).catch(() => null) as Project | null
+
+    if (proj) {
+      let workItemBudget: number | null = null
+      let workItemName = ''
+      if (workItemType === 'phase') {
+        const ph = workItem as ProjectPhase
+        workItemBudget = (ph as ProjectPhase & { budgetAllocation?: number | null }).budgetAllocation ?? null
+        workItemName = ph.name
+      } else {
+        const t = workItem as Task
+        workItemName = t.name
+      }
+
+      budgetData = {
+        projectBudget: proj.budget ?? null,
+        projectName: proj.name,
+        projectExistingCost,
+        workItemBudget,
+        workItemExistingCost,
+        workItemName,
+      }
+    }
+  }
+
   return NextResponse.json({
     requiredSkills,
     projectSectorName: sectorName,
@@ -126,5 +173,6 @@ export async function GET(req: NextRequest) {
     candidates,
     empProjectRates,
     roles: roleList,
+    budgetData,
   })
 }
