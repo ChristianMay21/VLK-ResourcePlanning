@@ -102,7 +102,6 @@ export default function PhaseForm(props: PhaseFormProps) {
             className={styles.moneyInput}
             value={budget}
             onChange={e => setBudget(e.target.value)}
-            placeholder="Optional"
           />
         </div>
       </div>

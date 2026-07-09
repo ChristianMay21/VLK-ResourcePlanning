@@ -200,6 +200,7 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
     setSaving(false)
     setEditMode(false)
     load()
+    props.onAssignmentChange?.()
   }
 
   async function deleteTask() {
