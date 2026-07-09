@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import EmployeeCard from '@/components/EmployeeCard/EmployeeCard'
+import TeamTimeline from '@/components/TeamTimeline/TeamTimeline'
+import type { TimelineEntry, TimelineEmployee } from '@/components/TeamTimeline/TeamTimeline'
 import type { AssignmentForUtil } from '@/lib/utilization'
 import styles from './EmployeeGrid.module.scss'
 
@@ -17,12 +19,20 @@ type EmployeeData = {
 
 type EmployeeGridProps = {
   employees: EmployeeData[]
+  timelineEntries: TimelineEntry[]
 }
 
 const WINDOW_OPTIONS = [4, 8, 12] as const
 
 export default function EmployeeGrid(props: EmployeeGridProps) {
   const [windowWeeks, setWindowWeeks] = useState<4 | 8 | 12>(4)
+
+  const timelineEmployees: TimelineEmployee[] = props.employees.map(emp => ({
+    id: emp.id,
+    name: emp.name,
+    color: emp.color,
+    capacity: emp.capacity,
+  }))
 
   return (
     <div className={styles.root}>
@@ -58,6 +68,11 @@ export default function EmployeeGrid(props: EmployeeGridProps) {
           />
         ))}
       </div>
+      <TeamTimeline
+        windowWeeks={windowWeeks}
+        employees={timelineEmployees}
+        timelineEntries={props.timelineEntries}
+      />
     </div>
   )
 }

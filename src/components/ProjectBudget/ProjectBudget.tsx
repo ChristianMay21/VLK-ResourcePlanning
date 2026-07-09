@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './ProjectBudget.module.scss'
 
 const PHASE_COLORS = ['#2c4a6e', '#4a7c59', '#b8862e', '#5a7fa3', '#9a6a4a', '#7a5c8a', '#b5432f', '#6b6558']
@@ -38,6 +38,16 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
     props.phases.forEach(p => { m[p.id] = p.budgetAllocation })
     return m
   })
+  useEffect(() => {
+    setAllocations(prev => {
+      const updated = { ...prev }
+      props.phases.forEach(p => {
+        if (!(p.id in updated)) updated[p.id] = p.budgetAllocation
+      })
+      return updated
+    })
+  }, [props.phases])
+
   const [editingPhase, setEditingPhase] = useState<string | null>(null)
   const [phaseDraft, setPhaseDraft] = useState('')
   const [savingPhase, setSavingPhase] = useState(false)
