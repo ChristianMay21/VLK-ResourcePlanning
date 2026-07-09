@@ -4,12 +4,14 @@ import { createContext, useContext, useState } from 'react'
 import type EmployeeDetail from '@/components/EmployeeDetail/EmployeeDetail'
 import type WorkItemDetail from '@/components/WorkItemDetail/WorkItemDetail'
 import type EmployeeForm from '@/components/EmployeeForm/EmployeeForm'
+import type ProjectForm from '@/components/ProjectForm/ProjectForm'
 
 // DrawerState is a discriminated union — the type IS the registry.
 export type DrawerState =
   | { component: typeof EmployeeDetail; componentProps: React.ComponentProps<typeof EmployeeDetail> }
   | { component: typeof WorkItemDetail; componentProps: React.ComponentProps<typeof WorkItemDetail> }
   | { component: typeof EmployeeForm; componentProps: React.ComponentProps<typeof EmployeeForm> }
+  | { component: typeof ProjectForm; componentProps: React.ComponentProps<typeof ProjectForm> }
 
 type DrawerContextType = {
   drawer: DrawerState | null

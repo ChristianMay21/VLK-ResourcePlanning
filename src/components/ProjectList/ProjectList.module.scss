@@ -21,6 +21,12 @@
   color: $ink;
 }
 
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .count {
   font-family: $font-plex-mono;
   font-size: 11px;

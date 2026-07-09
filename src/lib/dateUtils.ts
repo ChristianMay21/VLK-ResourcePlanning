@@ -1,5 +1,5 @@
 export function parseDate(str: string): Date {
-  const [y, m, d] = str.split('-').map(Number)
+  const [y, m, d] = str.slice(0, 10).split('-').map(Number)
   return new Date(y, m - 1, d)
 }
 

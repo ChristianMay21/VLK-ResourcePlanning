@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 import config from '@/payload.config'
 import type { Assignment, Employee, Project, ProjectPhase, Sector, Task } from '@/payload-types'
 import ProjectCard from '@/components/ProjectCard/ProjectCard'
+import NewProjectButton from '@/components/NewProjectButton/NewProjectButton'
 import { formatDateRange } from '@/lib/dateUtils'
 import { rollingUtilizationPct, type AssignmentForUtil } from '@/lib/utilization'
 import styles from './ProjectList.module.scss'
@@ -106,7 +107,10 @@ export default async function ProjectList() {
     <div className={styles.root}>
       <div className={styles.header}>
         <h2 className={styles.title}>Projects</h2>
-        <span className={styles.count}>{projects.length} {projects.length === 1 ? 'PROJECT' : 'PROJECTS'}</span>
+        <div className={styles.headerRight}>
+          <span className={styles.count}>{projects.length} {projects.length === 1 ? 'PROJECT' : 'PROJECTS'}</span>
+          <NewProjectButton />
+        </div>
       </div>
       <div className={styles.list}>
         {projects.map(project => {

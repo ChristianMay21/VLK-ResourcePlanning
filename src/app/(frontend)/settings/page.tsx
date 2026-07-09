@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import EmployeeForm from '@/components/EmployeeForm/EmployeeForm'
 import { useDrawer } from '@/context/DrawerContext'
+import { getInitials } from '@/lib/dateUtils'
 import styles from './page.module.scss'
 
 type Employee = {
@@ -14,6 +15,7 @@ type Employee = {
   color: string | null
 }
 
+type Client = { id: string; name: string }
 type Role = { id: string; name: string }
 type Sector = { id: string; name: string }
 type Skill = { id: string; name: string }
@@ -21,9 +23,13 @@ type Skill = { id: string; name: string }
 export default function AdminPage() {
   const { setDrawer } = useDrawer()
   const [employees, setEmployees] = useState<Employee[]>([])
+  const [clients, setClients] = useState<Client[]>([])
   const [roles, setRoles] = useState<Role[]>([])
   const [sectors, setSectors] = useState<Sector[]>([])
   const [skills, setSkills] = useState<Skill[]>([])
+  const [editingClientId, setEditingClientId] = useState<string | null>(null)
+  const [editingClientName, setEditingClientName] = useState('')
+  const [newClientName, setNewClientName] = useState('')
   const [editingRoleId, setEditingRoleId] = useState<string | null>(null)
   const [editingRoleName, setEditingRoleName] = useState('')
   const [newRoleName, setNewRoleName] = useState('')
@@ -50,6 +56,10 @@ export default function AdminPage() {
     })
   }, [])
 
+  const loadClients = useCallback(() => {
+    fetch('/api/clients?limit=200').then(r => r.json()).then(d => setClients(d.docs ?? []))
+  }, [])
+
   const loadRoles = useCallback(() => {
     fetch('/api/roles?limit=200').then(r => r.json()).then(d => setRoles(d.docs ?? []))
   }, [])
@@ -64,10 +74,11 @@ export default function AdminPage() {
 
   useEffect(() => {
     loadEmployees()
+    loadClients()
     loadRoles()
     loadSectors()
     loadSkills()
-  }, [loadEmployees, loadRoles, loadSectors, loadSkills])
+  }, [loadEmployees, loadClients, loadRoles, loadSectors, loadSkills])
 
   function openAddEmployee() {
     setDrawer({ component: EmployeeForm, componentProps: { onSave: loadEmployees } })
@@ -77,14 +88,52 @@ export default function AdminPage() {
     setDrawer({ component: EmployeeForm, componentProps: { employeeId: id, onSave: loadEmployees } })
   }
 
+  // Clients CRUD
+  async function saveClient(id: string) {
+    if (!editingClientName.trim()) return
+    await fetch(`/api/admin-clients/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: editingClientName.trim() }),
+    })
+    setEditingClientId(null)
+    loadClients()
+  }
+
+  async function deleteClient(id: string) {
+    const res = await fetch(`/api/admin-clients/${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      const data = await res.json()
+      alert(data.error ?? 'Cannot delete')
+      return
+    }
+    loadClients()
+  }
+
+  async function addClient() {
+    if (!newClientName.trim()) return
+    await fetch('/api/admin-clients', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: newClientName.trim() }),
+    })
+    setNewClientName('')
+    loadClients()
+  }
+
   // Roles CRUD
   async function saveRole(id: string) {
     if (!editingRoleName.trim()) return
-    await fetch(`/api/admin-roles/${id}`, {
+    const res = await fetch(`/api/admin-roles/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: editingRoleName.trim() }),
     })
+    if (!res.ok) {
+      const data = await res.json()
+      alert(data.error ?? 'Cannot save')
+      return
+    }
     setEditingRoleId(null)
     loadRoles()
   }
@@ -101,11 +150,16 @@ export default function AdminPage() {
 
   async function addRole() {
     if (!newRoleName.trim()) return
-    await fetch('/api/admin-roles', {
+    const res = await fetch('/api/admin-roles', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: newRoleName.trim() }),
     })
+    if (!res.ok) {
+      const data = await res.json()
+      alert(data.error ?? 'Cannot create')
+      return
+    }
     setNewRoleName('')
     loadRoles()
   }
@@ -192,7 +246,9 @@ export default function AdminPage() {
               <span
                 className={styles.empDot}
                 style={{ background: emp.color ?? '#9a9484' }}
-              />
+              >
+                {getInitials(emp.name)}
+              </span>
               <div className={styles.empInfo}>
                 <span className={styles.empName}>{emp.name}</span>
                 {emp.jobTitle && <span className={styles.empMeta}>{emp.jobTitle}</span>}
@@ -244,6 +300,48 @@ export default function AdminPage() {
             onKeyDown={e => { if (e.key === 'Enter') addRole() }}
           />
           <button type="button" className={styles.addBtn} onClick={addRole} disabled={!newRoleName.trim()}>ADD</button>
+        </div>
+      </section>
+
+      {/* Clients Section */}
+      <section className={styles.section}>
+        <h3 className={styles.sectionTitle}>Clients</h3>
+        <div className={styles.list}>
+          {clients.map(client => (
+            <div key={client.id} className={styles.listRow}>
+              {editingClientId === client.id ? (
+                <>
+                  <input
+                    type="text"
+                    className={styles.inlineInput}
+                    value={editingClientName}
+                    onChange={e => setEditingClientName(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') saveClient(client.id); if (e.key === 'Escape') setEditingClientId(null) }}
+                    autoFocus
+                  />
+                  <button type="button" className={styles.saveBtn} onClick={() => saveClient(client.id)}>SAVE</button>
+                  <button type="button" className={styles.cancelBtn} onClick={() => setEditingClientId(null)}>CANCEL</button>
+                </>
+              ) : (
+                <>
+                  <span className={styles.itemName}>{client.name}</span>
+                  <button type="button" className={styles.editBtn} onClick={() => { setEditingClientId(client.id); setEditingClientName(client.name) }}>EDIT</button>
+                  <button type="button" className={styles.deleteBtn} onClick={() => deleteClient(client.id)}>DELETE</button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className={styles.addRow}>
+          <input
+            type="text"
+            className={styles.inlineInput}
+            placeholder="New client name…"
+            value={newClientName}
+            onChange={e => setNewClientName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') addClient() }}
+          />
+          <button type="button" className={styles.addBtn} onClick={addClient} disabled={!newClientName.trim()}>ADD</button>
         </div>
       </section>
 

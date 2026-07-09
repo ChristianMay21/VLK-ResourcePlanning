@@ -10,6 +10,17 @@ export async function PATCH(req: NextRequest, context: { params: Promise<Params>
   if (!name?.trim()) return NextResponse.json({ error: 'Name required' }, { status: 400 })
 
   const payload = await getPayload({ config: await config })
+
+  const { docs: existing } = await payload.find({
+    collection: 'roles',
+    where: { name: { equals: name.trim() } },
+    limit: 1,
+    overrideAccess: true,
+  })
+  if (existing.length > 0 && existing[0].id !== id) {
+    return NextResponse.json({ error: 'A role with that name already exists' }, { status: 409 })
+  }
+
   const updated = await payload.update({ collection: 'roles', id, data: { name: name.trim() }, overrideAccess: true })
   return NextResponse.json(updated)
 }
