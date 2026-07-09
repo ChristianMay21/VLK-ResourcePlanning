@@ -9,7 +9,7 @@ export default function Nav() {
 
   return (
     <header className={styles.root}>
-      <span className={styles.wordmark}>Workload Planner</span>
+      <span className={styles.wordmark}>Resource Planner</span>
       <nav className={styles.nav}>
         <Link className={styles.tab} href="/projects" data-active={pathname.startsWith('/projects')}>
           PROJECTS

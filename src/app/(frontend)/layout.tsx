@@ -29,7 +29,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata = {
   description: 'Resource planning for architecture firms.',
-  title: 'Workload Planner',
+  title: 'Resource Planner',
 }
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
