@@ -1,0 +1,122 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.empty {
+  font-family: $font-plex-mono;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: $ink-soft;
+  padding: 40px 0;
+}
+
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  border-bottom: 2px solid $ink;
+  padding-bottom: 8px;
+  margin-bottom: 0;
+}
+
+.categoryName {
+  margin: 0;
+  font-family: $font-newsreader;
+  font-size: 20px;
+  font-weight: 500;
+  color: $ink;
+}
+
+.taskCount {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: $ink-soft;
+}
+
+.noTasks {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: $ink-soft;
+  padding: 16px 0;
+  border-bottom: 1px solid $line;
+}
+
+.taskList {
+  display: flex;
+  flex-direction: column;
+}
+
+.taskRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid $line;
+  background: transparent;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  &[data-complete] {
+    opacity: 0.6;
+  }
+}
+
+.taskStatus {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6b6558;
+  flex-shrink: 0;
+
+  &[data-complete] {
+    background: $green;
+  }
+}
+
+.taskName {
+  font-family: $font-newsreader;
+  font-size: 15px;
+  color: $ink;
+  flex: 1;
+  min-width: 0;
+}
+
+.taskDates {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: $ink-soft;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.taskAssigned {
+  font-family: $font-plex-mono;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: #6b6558;
+  border: 1px solid rgba(107, 101, 88, 0.3);
+  padding: 2px 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
