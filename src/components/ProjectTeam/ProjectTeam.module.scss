@@ -1,0 +1,103 @@
+@use '../../app/styles/design-system/index.scss' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.assignBtn {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: $blue;
+  background: $blue-fill;
+  border: 1px solid $blue;
+  padding: 7px 14px;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(44, 74, 110, 0.2);
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid $line;
+}
+
+.avatarBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.nameBtn {
+  font-size: 14px;
+  font-weight: 500;
+  color: $ink;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    color: $blue;
+  }
+}
+
+.meta {
+  font-size: 12.5px;
+  color: $ink-soft;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rate {
+  font-family: $font-plex-mono;
+  font-size: 11px;
+  color: $ink-soft;
+  white-space: nowrap;
+}
+
+.hours {
+  font-family: $font-plex-mono;
+  font-size: 12px;
+  color: $blue;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.empty {
+  font-size: 13px;
+  color: $ink-soft;
+  font-style: italic;
+  margin: 0;
+}

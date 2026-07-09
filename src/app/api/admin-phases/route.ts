@@ -9,6 +9,7 @@ export async function POST(req: NextRequest) {
   const startDate: string = body.startDate
   const endDate: string = body.endDate
   const projectId: string = body.projectId
+  const budgetAllocation: number | undefined = body.budget != null ? parseFloat(body.budget) : undefined
 
   if (!name) return NextResponse.json({ error: 'Name required' }, { status: 400 })
   if (!startDate || !endDate) return NextResponse.json({ error: 'Start and end date required' }, { status: 400 })
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
 
   const phase = await payload.create({
     collection: 'project-phases',
-    data: { name, startDate, endDate },
+    data: { name, startDate, endDate, ...(budgetAllocation != null && !isNaN(budgetAllocation) ? { budgetAllocation } : {}) },
     overrideAccess: true,
   })
 

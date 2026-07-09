@@ -50,7 +50,7 @@ export default function EmployeeForm(props: EmployeeFormProps) {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/employees?limit=200').then(r => r.json()),
+      fetch('/api/employees?limit=200&sort=name').then(r => r.json()),
       fetch('/api/sectors?limit=200&sort=name').then(r => r.json()),
       fetch('/api/skills?limit=200&sort=name').then(r => r.json()),
     ]).then(([empData, sectorData, skillData]) => {

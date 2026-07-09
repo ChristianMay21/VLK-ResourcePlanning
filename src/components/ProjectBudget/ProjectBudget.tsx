@@ -24,6 +24,7 @@ type ProjectBudgetProps = {
   projectId: string
   budget: number | null
   phases: PhaseBudgetData[]
+  directCost?: number
 }
 
 export default function ProjectBudget(props: ProjectBudgetProps) {
@@ -42,7 +43,7 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
   const [savingPhase, setSavingPhase] = useState(false)
   const [phaseError, setPhaseError] = useState<string | null>(null)
 
-  const totalAllocated = props.phases.reduce((sum, p) => sum + (allocations[p.id] ?? 0), 0)
+  const totalAllocated = props.phases.reduce((sum, p) => sum + (allocations[p.id] ?? 0), 0) + (props.directCost ?? 0)
   const totalUnallocated = budget != null ? budget - totalAllocated : null
   const allocatedPct = budget != null && budget > 0 ? (totalAllocated / budget) * 100 : 0
   const unallocatedPct = budget != null && budget > 0 && totalUnallocated != null
@@ -191,6 +192,13 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
                     </div>
                   )
                 })}
+                {props.directCost != null && props.directCost > 0 && (
+                  <div
+                    className={styles.barDirect}
+                    style={{ width: `${(props.directCost / budget) * 100}%` }}
+                    title={`Direct project-level cost: ${fmtMoney(props.directCost)}`}
+                  />
+                )}
                 {totalUnallocated != null && totalUnallocated > 0 && (
                   <div
                     className={styles.barUnallocated}
@@ -206,10 +214,12 @@ export default function ProjectBudget(props: ProjectBudgetProps) {
                   <span className={styles.legendSpent} />
                   Spent within allocation
                 </span>
-                <span className={styles.legendItem}>
-                  <span className={styles.legendAlloc} />
-                  Direct project-level cost
-                </span>
+                {props.directCost != null && props.directCost > 0 && (
+                  <span className={styles.legendItem}>
+                    <span className={styles.legendDirect} />
+                    Direct project-level cost
+                  </span>
+                )}
                 <span className={styles.legendItem}>
                   <span className={styles.legendUnalloc} />
                   Unallocated

@@ -13,7 +13,7 @@ import styles from './WorkItemDetail.module.scss'
 
 type WorkItemDetailProps = {
   workItemId: string
-  workItemType: 'phase' | 'task'
+  workItemType: 'phase' | 'task' | 'project'
   openAssign?: boolean
   onAssignmentChange?: () => void
 }
@@ -40,7 +40,7 @@ type TeamMember = {
 type ChildMember = { viaName: string } & TeamMember
 
 type DetailData = {
-  type: 'phase' | 'task'
+  type: 'phase' | 'task' | 'project'
   isInternal: boolean
   item: {
     id: string; name: string; startDate: string; endDate: string
@@ -231,7 +231,7 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
         workItemType={props.workItemType}
         workItemStartDate={data.item.startDate}
         workItemEndDate={data.item.endDate}
-        projectId={data.project?.id ?? null}
+        projectId={data.type === 'project' ? data.item.id : (data.project?.id ?? null)}
         isInternal={data.isInternal}
         categoryId={data.category?.id ?? null}
         editingAssignment={editing ? {
@@ -256,7 +256,7 @@ export default function WorkItemDetail(props: WorkItemDetailProps) {
       <div className={styles.root}>
         <div className={styles.editHeader}>
           <button type="button" className={styles.backBtn} onClick={() => setEditMode(false)}>‹ BACK</button>
-          <span className={styles.editTitle}>{data.type === 'task' ? 'EDIT TASK' : 'EDIT PHASE'}</span>
+          <span className={styles.editTitle}>{data.type === 'task' ? 'EDIT TASK' : data.type === 'phase' ? 'EDIT PHASE' : 'EDIT'}</span>
         </div>
 
         <div className={styles.editField}>

@@ -29,8 +29,8 @@ export default function ProjectForm(props: ProjectFormProps) {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/clients?limit=200').then(r => r.json()),
-      fetch('/api/sectors?limit=200').then(r => r.json()),
+      fetch('/api/clients?limit=200&sort=name').then(r => r.json()),
+      fetch('/api/sectors?limit=200&sort=name').then(r => r.json()),
     ]).then(([clientData, sectorData]) => {
       const clientList: ClientOption[] = (clientData.docs ?? []).map((c: { id: string; name: string }) => ({ id: c.id, name: c.name }))
       setClients(clientList)

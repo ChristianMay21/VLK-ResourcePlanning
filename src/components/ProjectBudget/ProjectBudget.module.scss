@@ -221,6 +221,12 @@
   pointer-events: none;
 }
 
+.barDirect {
+  height: 100%;
+  background: $ink-soft;
+  flex-shrink: 0;
+}
+
 .barUnallocated {
   height: 100%;
   background-image: repeating-linear-gradient(
@@ -260,7 +266,7 @@
   flex-shrink: 0;
 }
 
-.legendAlloc {
+.legendDirect {
   width: 8px;
   height: 8px;
   background: $ink-soft;

@@ -6,7 +6,7 @@ import type { Assignment, Employee, Project, ProjectPhase, Role, Sector, Task } 
 import ProjectGantt from '@/components/ProjectGantt/ProjectGantt'
 import PhaseList from '@/components/PhaseList/PhaseList'
 import ProjectBudget from '@/components/ProjectBudget/ProjectBudget'
-import UtilizationRing from '@/components/UtilizationRing/UtilizationRing'
+import ProjectTeam from '@/components/ProjectTeam/ProjectTeam'
 import DeleteProjectButton from '@/components/DeleteProjectButton/DeleteProjectButton'
 import { formatDateRange, deriveStatus } from '@/lib/dateUtils'
 import { rollingUtilizationPct, type AssignmentForUtil } from '@/lib/utilization'
@@ -201,12 +201,16 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
     cost: phaseCosts[phase.id] ?? 0,
   }))
 
+  // Compute direct project-level assignment cost
+  const directProjectCost = projectAssignments.reduce((sum, a) => sum + assignmentCost(a), 0)
+
   // Build "Team on This Project" — unique employees across all assignments
   type TeamEntry = {
     id: string
     name: string
     color: string | null
     roles: string[]
+    rate: number | null
     totalHours: number
     totalCost: number
     capacity: number
@@ -223,6 +227,7 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
         name: emp.name,
         color: emp.color ?? null,
         roles: [],
+        rate: null,
         totalHours: 0,
         totalCost: 0,
         capacity: emp.maximumHours ?? 40,
@@ -232,6 +237,9 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
     teamMap[emp.id].totalCost += assignmentCost(assignment)
     if (roleName && !teamMap[emp.id].roles.includes(roleName)) {
       teamMap[emp.id].roles.push(roleName)
+    }
+    if (assignment.rate != null && teamMap[emp.id].rate == null) {
+      teamMap[emp.id].rate = assignment.rate
     }
   }
   const team = Object.values(teamMap)
@@ -282,6 +290,7 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
         projectId={id}
         budget={projectBudget}
         phases={phaseBudgetData}
+        directCost={directProjectCost > 0 ? directProjectCost : undefined}
       />
 
       {ganttBars.length > 0 && (
@@ -304,36 +313,20 @@ export default async function ProjectDetailPage(props: { params: Promise<Params>
 
       <section className={styles.section}>
         <h3 className={styles.sectionTitle}>Team on This Project</h3>
-        {team.length > 0 ? (
-          <div className={styles.team}>
-            {team.map(member => (
-              <div key={member.id} className={styles.teamRow}>
-                <UtilizationRing
-                  size="sm"
-                  pct={rollingUtilizationPct(empAllAssignments[member.id] ?? [], member.capacity, 4, today)}
-                  name={member.name}
-                  avatarColor={member.color ?? '#9a9484'}
-                  windowWeeks={4}
-                />
-                <div className={styles.teamInfo}>
-                  <div className={styles.teamName}>{member.name}</div>
-                  <div className={styles.teamRoles}>{member.roles.join(', ')}</div>
-                </div>
-                <span className={styles.teamHours}>
-                  {member.totalHours} hrs
-                  {member.totalCost > 0 && <> · {fmtMoney(member.totalCost)}</>}
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className={styles.empty}>No one assigned yet.</p>
-        )}
+        <ProjectTeam
+          projectId={id}
+          members={team.map(member => ({
+            id: member.id,
+            name: member.name,
+            color: member.color,
+            roles: member.roles,
+            rate: member.rate,
+            totalHours: member.totalHours,
+            totalCost: member.totalCost,
+            utilPct: rollingUtilizationPct(empAllAssignments[member.id] ?? [], member.capacity, 4, today),
+          }))}
+        />
       </section>
     </div>
   )
-}
-
-function fmtMoney(n: number): string {
-  return '$' + Math.round(n).toLocaleString('en-US')
 }

@@ -6,7 +6,7 @@ import { rollingUtilizationPct } from '@/lib/utilization'
 
 export async function GET(req: NextRequest) {
   const workItemId = req.nextUrl.searchParams.get('workItemId')
-  const workItemType = req.nextUrl.searchParams.get('workItemType') as 'phase' | 'task' | null
+  const workItemType = req.nextUrl.searchParams.get('workItemType') as 'phase' | 'task' | 'project' | null
   const projectId = req.nextUrl.searchParams.get('projectId')
   const categoryId = req.nextUrl.searchParams.get('categoryId')
 
@@ -19,10 +19,12 @@ export async function GET(req: NextRequest) {
   const payload = await getPayload({ config: await config })
 
   const [workItem, { docs: employees }, { docs: allAssignments }, { docs: roles }] = await Promise.all([
-    workItemType === 'phase'
+    workItemType === 'project'
+      ? payload.findByID({ collection: 'projects', id: workItemId, depth: 0, overrideAccess: true }).catch(() => null)
+      : workItemType === 'phase'
       ? payload.findByID({ collection: 'project-phases', id: workItemId, depth: 0, overrideAccess: true }).catch(() => null)
       : payload.findByID({ collection: 'tasks', id: workItemId, depth: 0, overrideAccess: true }).catch(() => null),
-    payload.find({ collection: 'employees', limit: 200, overrideAccess: true }),
+    payload.find({ collection: 'employees', limit: 200, sort: 'name', overrideAccess: true }),
     payload.find({ collection: 'assignments', depth: 1, limit: 10000, overrideAccess: true }),
     payload.find({ collection: 'roles', limit: 100, overrideAccess: true }),
   ])
@@ -59,7 +61,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  const wi = workItem as ProjectPhase | Task
+  const wi = workItem as ProjectPhase | Task | { requiredSkills?: Array<{ skill: string }> }
   const requiredSkills = (wi.requiredSkills ?? []).map((s: { skill: string }) => s.skill)
 
   // Build per-employee util data and project rate map
@@ -123,7 +125,9 @@ export async function GET(req: NextRequest) {
     .filter((r: Role) => {
       const allowed = r.allowedOn ?? ['projects', 'project-phases', 'tasks', 'internal']
       if (isInternal) return allowed.includes('internal')
-      const collectionSlug = workItemType === 'phase' ? 'project-phases' : 'tasks'
+      const collectionSlug = workItemType === 'project' ? 'projects'
+        : workItemType === 'phase' ? 'project-phases'
+        : 'tasks'
       return allowed.includes(collectionSlug as 'projects' | 'project-phases' | 'tasks')
     })
     .map((r: Role) => ({ id: r.id, name: r.name }))
@@ -146,7 +150,10 @@ export async function GET(req: NextRequest) {
     if (proj) {
       let workItemBudget: number | null = null
       let workItemName = ''
-      if (workItemType === 'phase') {
+      if (workItemType === 'project') {
+        workItemName = proj.name
+        // No sub-budget for project-level — the project IS the budget reference
+      } else if (workItemType === 'phase') {
         const ph = workItem as ProjectPhase
         workItemBudget = (ph as ProjectPhase & { budgetAllocation?: number | null }).budgetAllocation ?? null
         workItemName = ph.name

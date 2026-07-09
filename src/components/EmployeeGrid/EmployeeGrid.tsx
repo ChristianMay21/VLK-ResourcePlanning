@@ -27,7 +27,7 @@ export default function EmployeeGrid(props: EmployeeGridProps) {
   return (
     <div className={styles.root}>
       <div className={styles.header}>
-        <h2 className={styles.title}>Employees</h2>
+        <h2 className={styles.title}>Staff</h2>
         <div className={styles.windowSelector}>
           <span className={styles.windowLabel}>WINDOW</span>
           {WINDOW_OPTIONS.map(w => (

@@ -45,7 +45,7 @@ type EditingAssignment = {
 
 type AssignmentFlowProps = {
   workItemId: string
-  workItemType: 'phase' | 'task'
+  workItemType: 'phase' | 'task' | 'project'
   workItemStartDate: string
   workItemEndDate: string
   projectId: string | null

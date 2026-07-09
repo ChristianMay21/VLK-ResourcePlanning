@@ -15,7 +15,7 @@ export default function Nav() {
           PROJECTS
         </Link>
         <Link className={styles.tab} href="/employees" data-active={pathname.startsWith('/employees')}>
-          EMPLOYEES
+          STAFF
         </Link>
         <Link className={styles.tab} href="/internal-work" data-active={pathname.startsWith('/internal-work')}>
           INTERNAL WORK

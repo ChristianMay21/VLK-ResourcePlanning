@@ -393,7 +393,7 @@ export default function AdminPage() {
       {/* Employees Section */}
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h3 className={styles.sectionTitle}>Employees</h3>
+          <h3 className={styles.sectionTitle}>Staff</h3>
           <button type="button" className={styles.addBtn} onClick={openAddEmployee}>+ ADD EMPLOYEE</button>
         </div>
         <div className={styles.list}>

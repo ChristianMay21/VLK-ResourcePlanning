@@ -16,6 +16,7 @@ export default function PhaseForm(props: PhaseFormProps) {
   const [name, setName] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [budget, setBudget] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -36,7 +37,7 @@ export default function PhaseForm(props: PhaseFormProps) {
     const res = await fetch('/api/admin-phases', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ projectId: props.projectId, name: name.trim(), startDate, endDate }),
+      body: JSON.stringify({ projectId: props.projectId, name: name.trim(), startDate, endDate, budget: budget ? parseFloat(budget) : undefined }),
     })
     setSaving(false)
     if (!res.ok) {
@@ -87,6 +88,23 @@ export default function PhaseForm(props: PhaseFormProps) {
           value={endDate}
           onChange={e => setEndDate(e.target.value)}
         />
+      </div>
+
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="phase-budget">BUDGET ($)</label>
+        <div className={styles.moneyField}>
+          <span className={styles.moneyPrefix} aria-hidden="true">$</span>
+          <input
+            id="phase-budget"
+            type="number"
+            min="0"
+            step="1000"
+            className={styles.moneyInput}
+            value={budget}
+            onChange={e => setBudget(e.target.value)}
+            placeholder="Optional"
+          />
+        </div>
       </div>
 
       {error && <div className={styles.error}>{error}</div>}
